@@ -57,10 +57,9 @@ def platforms_of(post):
 
 def token(platform, account):
     """Secretsの名前は IG_TOKEN_<アカウント> / THREADS_TOKEN_<アカウント>（例：IG_TOKEN_LUA）。
-    ワークフローは Secrets 全体を SECRETS_JSON で渡す（事業を足すたびにワークフローを直さなくてよいように）"""
+    ワークフローの env に1つずつ書いて渡す（Secrets全体を渡すとGitHubに「怪しい実行」として止められるため）"""
     name = f"{'IG' if platform == 'instagram' else 'THREADS'}_TOKEN_{account.upper()}"
-    secrets = json.loads(os.environ.get("SECRETS_JSON") or "{}")
-    value = secrets.get(name) or os.environ.get(name)
+    value = os.environ.get(name)
     if not value:
         raise ApiError(f"Secrets に {name} がありません")
     return value

@@ -1,6 +1,5 @@
 """長期トークン（60日有効）を延長する。週1回、GitHub Actionsが動かし、新しいトークンを Secrets に保存し直す。
-Secrets のうち IG_TOKEN_* / THREADS_TOKEN_* をすべて延長する（事業を足しても直さなくてよい）。"""
-import json
+ワークフローが渡す IG_TOKEN_* / THREADS_TOKEN_* をすべて延長する。"""
 import os
 import subprocess
 import sys
@@ -14,10 +13,9 @@ KINDS = {
 
 
 def main():
-    secrets = json.loads(os.environ.get("SECRETS_JSON") or "{}")
     failed = False
     found = 0
-    for name, token in sorted(secrets.items()):
+    for name, token in sorted(os.environ.items()):
         kind = next((k for k in KINDS if name.startswith(k)), None)
         if not kind or not token:
             continue

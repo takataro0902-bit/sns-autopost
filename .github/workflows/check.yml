@@ -9,6 +9,8 @@ jobs:
       - uses: actions/checkout@v5
       - name: 確認（投稿はしません）
         env:
-          SECRETS_JSON: ${{ toJSON(secrets) }}
+          # 事業を足したら、ここにその事業のトークンを1行ずつ足す（Claudeがやります）
+          IG_TOKEN_LUA: ${{ secrets.IG_TOKEN_LUA }}
+          THREADS_TOKEN_LUA: ${{ secrets.THREADS_TOKEN_LUA }}
           MEDIA_BASE_URL: ${{ vars.MEDIA_BASE_URL }}
         run: python3 scripts/check.py

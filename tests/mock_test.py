@@ -34,7 +34,7 @@ def setup():
     return repo
 
 def run(repo, script, *args, env=None):
-    e = dict(os.environ, IG_HOST=base, TH_HOST=base, MEDIA_BASE_URL=base + "/pages/", SECRETS_JSON='{"IG_TOKEN_LUA": "tok", "THREADS_TOKEN_LUA": "t"}', POLL_INTERVAL="0", FAKE_NOW="2026-10-20T13:05:00+09:00")
+    e = dict(os.environ, IG_HOST=base, TH_HOST=base, MEDIA_BASE_URL=base + "/pages/", IG_TOKEN_LUA="tok", THREADS_TOKEN_LUA="t", POLL_INTERVAL="0", FAKE_NOW="2026-10-20T13:05:00+09:00")
     e.update(env or {})
     return subprocess.run([sys.executable, str(repo / script), *args], env=e, capture_output=True, text=True)
 
@@ -120,7 +120,7 @@ check("media ブランチを用意", br == "media" and (r / "media" / "ok.txt").
 STATE.update(calls=[])
 r = setup(); d = add_post(r, account="keiba"); p = run(r, "scripts/publish.py")
 check("configにないアカウントはエラーで知らせる", p.returncode == 1 and "keiba" in p.stdout, p.stdout)
-r = setup(); d = add_post(r); p = run(r, "scripts/publish.py", env={"SECRETS_JSON": "{}"})
+r = setup(); d = add_post(r); p = run(r, "scripts/publish.py", env={"IG_TOKEN_LUA": ""})
 check("トークンがなければ失敗に数える", "IG_TOKEN_LUA" in result(d)["instagram"].get("error", ""), result(d))
 
 # 10 トークン延長（gh は偽物に差し替え）
@@ -130,7 +130,7 @@ def g(self):
     if "refresh_access_token" in self.path: return self._send(200, {"access_token": "NEW", "expires_in": 5184000})
     return H.do_GET_orig(self)
 H.do_GET = g
-p = run(r, "scripts/refresh_tokens.py", env={"PATH": f"{fake}:{os.environ['PATH']}", "SECRETS_JSON": '{"IG_TOKEN_LUA": "a", "THREADS_TOKEN_KEIBA": "b", "GH_PAT": "x"}'})
+p = run(r, "scripts/refresh_tokens.py", env={"PATH": f"{fake}:{os.environ['PATH']}", "IG_TOKEN_LUA": "a", "THREADS_TOKEN_LUA": "", "THREADS_TOKEN_KEIBA": "b", "GH_PAT": "x"})
 log = (r.parent / "gh.log").read_text()
 check("IG_TOKEN_*・THREADS_TOKEN_* を全部延長", "IG_TOKEN_LUA" in log and "THREADS_TOKEN_KEIBA" in log and "GH_PAT" not in log, (p.stdout, log))
 

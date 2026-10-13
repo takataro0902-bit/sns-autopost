@@ -72,7 +72,7 @@
 Claudeがテスト用の投稿を1本用意し、本人の了解を取ってから「予約投稿」を `only` 指定で動かします。Metaのアプリが「開発中」のままで一般に見える投稿になるかは公式ページに記載がなく、このテストで確かめます。
 
 ## 事業やSNSを足すとき
-- **事業を足す**：`config.json` の `accounts` に1行足す（例：`"keiba": {"name": "競馬予想", "platforms": ["instagram"]}`）→ 本人が2・3の手順でトークンを作り `IG_TOKEN_KEIBA` を入れる。ワークフローの変更は不要
+- **事業を足す**：`config.json` の `accounts` に1行足す（例：`"keiba": {"name": "競馬予想", "platforms": ["instagram"]}`）→ 本人が2・3の手順でトークンを作り `IG_TOKEN_KEIBA` を入れる。Claudeが3つのワークフロー（予約投稿・設定の確認・トークン延長）にそのトークンの行を足す
 - **Threadsを足す**：Metaのアプリに「Threads APIにアクセス」の用途を追加 → トークンを `THREADS_TOKEN_<事業の略>` で入れる → その事業の `platforms` に `threads` を足す
 - **X**：未対応（従量課金。料金は上の表）
 
