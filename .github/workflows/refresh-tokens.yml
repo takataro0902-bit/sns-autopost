@@ -1,0 +1,16 @@
+name: トークン延長
+on:
+  schedule:
+    - cron: "0 0 * * 1"   # 毎週月曜 9:00（日本時間）
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: 延長してSecretsに保存
+        env:
+          SECRETS_JSON: ${{ toJSON(secrets) }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: python3 scripts/refresh_tokens.py

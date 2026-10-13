@@ -1,0 +1,39 @@
+name: 後片付け
+on:
+  schedule:
+    - cron: "0 18 * * 6"   # 毎週日曜 3:00（日本時間）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          ref: media
+          path: media
+      - name: 済んだ投稿の画像・動画を消す
+        run: python3 scripts/cleanup.py media
+      - name: media ブランチを1コミットに作り直す
+        working-directory: media
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan fresh
+          git add -A
+          git commit -q -m "画像・動画（後片付け後）"
+          git push -f origin HEAD:media
+      - name: 公開中の画像も入れ替える
+        # GITHUB_TOKEN の push では Pages が更新されないため、公開のワークフローを呼ぶ
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main

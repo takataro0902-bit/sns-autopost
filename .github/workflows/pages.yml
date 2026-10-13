@@ -1,0 +1,32 @@
+name: 画像の公開
+# media ブランチの画像・動画を GitHub Pages に出す（Settings → Pages の Source は「GitHub Actions」）
+# main に予約（queue/）が push されたときに動く。Pagesの公開は main からしか許されないため media ではなく main を起点にする
+on:
+  push:
+    branches: [main]
+    paths: ["queue/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: media
+          path: site
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+      - uses: actions/deploy-pages@v5

@@ -1,0 +1,17 @@
+{
+  "accounts": {
+    "lua": {
+      "name": "LUA GINZA",
+      "platforms": [
+        "instagram"
+      ]
+    }
+  },
+  "timezone_offset": "+09:00",
+  "max_late_minutes": 180,
+  "max_attempts": 3,
+  "instagram_api_version": "v25.0",
+  "threads_api_version": "v1.0",
+  "threads_max_chars": 500,
+  "prune_media_after_days": 3
+}

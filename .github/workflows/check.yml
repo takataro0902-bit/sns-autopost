@@ -1,0 +1,14 @@
+name: 設定の確認
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: 確認（投稿はしません）
+        env:
+          SECRETS_JSON: ${{ toJSON(secrets) }}
+          MEDIA_BASE_URL: ${{ vars.MEDIA_BASE_URL }}
+        run: python3 scripts/check.py
