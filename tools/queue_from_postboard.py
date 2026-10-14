@@ -37,7 +37,7 @@ def ensure_media_worktree():
     if (MEDIA / ".git").exists():
         return
     git = ["git", "-C", str(ROOT)]
-    has_remote = subprocess.run(git + ["fetch", "origin", "media"], capture_output=True).returncode == 0
+    has_remote = subprocess.run(git + ["fetch", "origin", "+refs/heads/media:refs/remotes/origin/media"], capture_output=True).returncode == 0
     if has_remote:
         subprocess.run(git + ["worktree", "add", "-B", "media", str(MEDIA), "origin/media"], check=True)
     else:
