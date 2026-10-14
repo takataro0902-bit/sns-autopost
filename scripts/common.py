@@ -1,6 +1,7 @@
 """共通の部品：設定の読み込み、HTTP、時刻、画像URLの組み立て。外部ライブラリは使わない。"""
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -54,6 +55,44 @@ def account_of(post):
 
 def platforms_of(post):
     return post.get("platforms") or CONFIG["accounts"][account_of(post)]["platforms"]
+
+
+URL_RE = re.compile(r"https?://[^\s　）)」』】>]+")
+
+
+def rule_problems(account, platforms, texts):
+    """config の accounts.<アカウント>.post_rules（アフィリエイト用の守り）に合わない所を並べて返す。
+    first_line_prefix：本文の1行目がこれで始まること（PR表記を末尾やハッシュタグに埋もれさせない）
+    link_domains：本文のURLはこのドメイン（とそのサブドメイン）だけ（ASPのリンク・短縮URLを直接貼らない）
+    banned_words：使わない言葉
+    platforms：post_rules のあるアカウントは、config の platforms 以外へは出さない"""
+    conf = CONFIG["accounts"].get(account, {})
+    rules = conf.get("post_rules")
+    if not rules:
+        return []
+    probs = [f"{p} にはこのアカウントから自動投稿しない設定です" for p in platforms if p not in conf["platforms"]]
+    prefix = rules.get("first_line_prefix")
+    domains = rules.get("link_domains")
+    for label, text in texts:
+        if not text:
+            continue
+        first = text.strip().splitlines()[0] if text.strip() else ""
+        if prefix and not first.startswith(prefix):
+            probs.append(f"{label}の1行目が「{prefix}」で始まっていません")
+        if domains is not None:
+            for u in URL_RE.findall(text):
+                host = (urllib.parse.urlsplit(u).hostname or "").lower()
+                if not any(host == d or host.endswith("." + d) for d in domains):
+                    probs.append(f"{label}に許可していないリンクがあります：{u}（使えるのは {', '.join(domains)}）")
+        for w in rules.get("banned_words", []):
+            if w.lower() in text.lower():
+                probs.append(f"{label}に使わない言葉「{w}」が入っています")
+    return probs
+
+
+def post_texts(post):
+    """投稿に使われうる本文をすべて（ラベル付きで）返す"""
+    return [(k, post.get(k)) for k in ("caption", "threads_caption", "discord_caption") if post.get(k)]
 
 
 def token(platform, account):

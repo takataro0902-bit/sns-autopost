@@ -15,6 +15,33 @@
       "discord_channels": {
         "main": "サロンの最初のチャンネル（名前はあとで実際のものに）"
       }
+    },
+    "inshoku": {
+      "name": "飲食の次の一歩（転職アフィリエイト）",
+      "platforms": [
+        "threads"
+      ],
+      "post_rules": {
+        "why": "アフィリエイト投稿の守り。ステマ規制とA8の案内に合わせ、1行目にPR表記・リンクは自分のブログだけ・誤解を招く言葉は出さない。Instagramはタイアップ投稿ラベルをAPIで付けられないので自動投稿しない",
+        "first_line_prefix": "【PR】",
+        "link_domains": [
+          "inshoku-nextstep.com"
+        ],
+        "banned_words": [
+          "必ず",
+          "絶対",
+          "誰でも",
+          "確実に",
+          "即日入寮",
+          "所持金なし",
+          "即金",
+          "高額",
+          "ホワイト",
+          "簡単",
+          "No.1",
+          "ナンバーワン"
+        ]
+      }
     }
   },
   "timezone_offset": "+09:00",
