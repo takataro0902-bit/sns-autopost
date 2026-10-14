@@ -1,0 +1,14 @@
+{
+  "publish_at": "2026-10-14T13:00:00+09:00",
+  "account": "umataro",
+  "type": "carousel",
+  "media": [
+    "01.jpg",
+    "02.jpg"
+  ],
+  "caption": "🏁【函館競馬場】2コース\n\n・芝1200m：函館スプリントS\n・芝2000m：函館記念\n\n※データは各コースの重賞の結果（2016〜2025年）から。画像を押すと大きく見られます",
+  "title": "course10hakodate",
+  "platforms": [
+    "discord"
+  ]
+}
