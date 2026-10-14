@@ -76,7 +76,21 @@ Claudeがテスト用の投稿を1本用意し、本人の了解を取ってか�
 - **Threadsを足す**：Metaのアプリに「Threads APIにアクセス」の用途を追加 → トークンを `THREADS_TOKEN_<事業の略>` で入れる → その事業の `platforms` に `threads` を足す
 - **X**：未対応（従量課金。料金は上の表）
 
-## Claudeの毎週の手順
+## ほかのプロジェクトから使う（各事業のClaude向け）
+
+各事業のプロジェクト（例：LUA GINZA）のClaudeが、作った投稿をそのまま予約に入れるための入口です。
+
+1. このリポジトリ（takataro0902-bit/sns-autopost）を取り出す
+2. 1本ずつ入れる：
+   `python3 tools/add_post.py --account lua --at "2026-10-20 20:00" --id futomomo3 --caption-file caption.txt 画像1.png 画像2.png …`
+   （zip をそのまま渡してもよい。mp4 ならリール）
+3. 入れ終わったら **media → main の順に** push：
+   `git -C media add -A && git -C media commit -m 投稿素材 && git -C media push origin media`
+   `git add queue && git commit -m 予約 && git push`
+4. 予約の一覧：`python3 tools/list_queue.py --account lua`
+5. 予約を取り消す：`git rm -r queue/<フォルダ>` して push（投稿済みのものは消しても投稿は消えない）
+
+## Claudeの毎週の手順（投稿表から1週間分まとめて入れるとき）
 
 1. その事業の投稿表（days.json：日付ごとに posts の id・time・kind・zip・caption）と各zipを作る
 2. `python3 tools/queue_from_postboard.py --account <事業> --from <月曜> --to <日曜> --days <days.json> --zips <zipのフォルダ>` で `queue/` に入れる（PNG→JPEG変換・枚数・動画の大きさチェック込み）
@@ -93,5 +107,7 @@ Claudeがテスト用の投稿を1本用意し、本人の了解を取ってか�
 - `scripts/refresh_tokens.py`：毎週月曜に、Secretsの `IG_TOKEN_*`・`THREADS_TOKEN_*` をすべて延長
 - `scripts/cleanup.py`：毎週日曜3時に、済んだ投稿の画像・動画を media ブランチから消し、ブランチを1コミットに作り直す
 - `scripts/check.py`：設定の確認（投稿はしない）
-- `tools/queue_from_postboard.py`：投稿表から `queue/` を作る
+- `tools/add_post.py`：1本ずつ予約に入れる（どのプロジェクトからでも）
+- `tools/list_queue.py`：予約と結果の一覧
+- `tools/queue_from_postboard.py`：投稿表から `queue/` を1週間分まとめて作る
 - `tests/mock_test.py`：模擬APIでのテスト（`python3 tests/mock_test.py .`）

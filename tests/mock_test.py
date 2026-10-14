@@ -136,4 +136,24 @@ p = run(r, "scripts/refresh_tokens.py", env={"PATH": f"{fake}:{os.environ['PATH'
 log = (r.parent / "gh.log").read_text()
 check("IG_TOKEN_*・THREADS_TOKEN_* を全部延長", "IG_TOKEN_LUA" in log and "THREADS_TOKEN_KEIBA" in log and "GH_PAT" not in log, (p.stdout, log))
 
+# 11 汎用の入口 add_post.py
+r = setup()
+subprocess.run(["git", "init", "-q", "-b", "main", str(r)], check=True)
+subprocess.run(["git", "-C", str(r), "-c", "user.name=x", "-c", "user.email=x@x", "commit", "-q", "--allow-empty", "-m", "init"], check=True)
+src = r.parent / "src2"; src.mkdir()
+with zipfile.ZipFile(src / "c.zip", "w") as z: z.writestr("b.png", png(1080, 1350)); z.writestr("a.png", png(1080, 1350))
+(src / "v.mp4").write_bytes(b"0" * 100)
+(src / "cap.txt").write_text("本文\n#a #b", encoding="utf-8")
+p1 = run(r, "tools/add_post.py", "--account", "lua", "--at", "2099-01-02 20:00", "--id", "c1", "--caption-file", str(src / "cap.txt"), str(src / "c.zip"))
+p2 = run(r, "tools/add_post.py", "--account", "lua", "--at", "2099-01-02 21:00", "--id", "r1", "--caption", "リール", str(src / "v.mp4"))
+p3 = run(r, "tools/add_post.py", "--account", "keiba", "--at", "2099-01-02 21:00", "--id", "x", "--caption", "x", str(src / "v.mp4"))
+j1 = json.loads((r / "queue" / "20990102_2000_lua_c1" / "post.json").read_text())
+j2 = json.loads((r / "queue" / "20990102_2100_lua_r1" / "post.json").read_text())
+check("add_post：zip→カルーセル・mp4→リール・知らない事業は断る",
+      j1["type"] == "carousel" and j1["media"] == ["01.jpg", "02.jpg"] and j1["caption"] == "本文\n#a #b" and j1["publish_at"] == "2099-01-02T20:00:00+09:00"
+      and j2["type"] == "reel" and (r / "media" / "queue" / "20990102_2100_lua_r1" / "01.mp4").exists() and p3.returncode != 0,
+      (p1.stdout, p1.stderr, p2.stderr, p3.stderr))
+p4 = run(r, "tools/list_queue.py")
+check("list_queue：予約が見える", "c1" in p4.stdout and "lua" in p4.stdout, p4.stdout + p4.stderr)
+
 print("\n全部OK" if ok else "\nNGあり"); sys.exit(0 if ok else 1)

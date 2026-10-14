@@ -38,7 +38,7 @@ def ensure_media_worktree():
     if (MEDIA / ".git").exists():
         # 後片付けで media ブランチは毎週作り直される（force push）ので、手元を最新に合わせる
         if subprocess.run(["git", "-C", str(MEDIA), "status", "--porcelain"], capture_output=True, text=True).stdout.strip():
-            sys.exit("./media に未コミットの変更があります。先に commit・push してください")
+            return  # まとめて入れている途中。最初の1本のときに最新に合わせてある
         subprocess.run(git + ["fetch", "origin", "+refs/heads/media:refs/remotes/origin/media"], check=True)
         subprocess.run(["git", "-C", str(MEDIA), "reset", "-q", "--hard", "origin/media"], check=True)
         return
