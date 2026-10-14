@@ -1,5 +1,7 @@
 """長期トークン（60日有効）を延長する。週1回、GitHub Actionsが動かし、新しいトークンを Secrets に保存し直す。
-ワークフローが渡す IG_TOKEN_* / THREADS_TOKEN_* をすべて延長する。"""
+ワークフローが渡す IG_TOKEN_* / THREADS_TOKEN_* をすべて延長する。
+Threadsは画面で作れるトークンが1時間しかもたない短期のものなので、THREADS_APP_SECRET があれば
+先に長期（60日）への交換を試す。交換できない（すでに長期）ときは、ふつうの延長に回す。"""
 import os
 import subprocess
 import sys
@@ -12,6 +14,17 @@ KINDS = {
 }
 
 
+def exchange_threads(token):
+    secret = os.environ.get("THREADS_APP_SECRET")
+    if not secret:
+        return None
+    try:
+        return http("GET", f"{TH_HOST}/access_token",
+                    {"grant_type": "th_exchange_token", "client_secret": secret, "access_token": token})
+    except ApiError:
+        return None
+
+
 def main():
     failed = False
     found = 0
@@ -22,7 +35,11 @@ def main():
         found += 1
         url, grant = KINDS[kind]
         try:
-            res = http("GET", url, {"grant_type": grant, "access_token": token})
+            res = exchange_threads(token) if kind == "THREADS_TOKEN_" else None
+            if res:
+                log(f"{name}：短期トークンを長期に交換しました")
+            else:
+                res = http("GET", url, {"grant_type": grant, "access_token": token})
             new = res["access_token"]
             days = int(res.get("expires_in", 0)) // 86400
             subprocess.run(["gh", "secret", "set", name, "--body", new], check=True)

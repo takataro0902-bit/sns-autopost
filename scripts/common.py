@@ -108,7 +108,7 @@ def http(method, url, params=None, timeout=60):
 def redact(url):
     """ログにトークンが出ないようにする"""
     p = urllib.parse.urlsplit(url)
-    q = [(k, "***" if "token" in k else v) for k, v in urllib.parse.parse_qsl(p.query)]
+    q = [(k, "***" if "token" in k or "secret" in k else v) for k, v in urllib.parse.parse_qsl(p.query)]
     return urllib.parse.urlunsplit(p._replace(query=urllib.parse.urlencode(q)))
 
 

@@ -135,6 +135,17 @@ H.do_GET = g
 p = run(r, "scripts/refresh_tokens.py", env={"PATH": f"{fake}:{os.environ['PATH']}", "IG_TOKEN_LUA": "a", "THREADS_TOKEN_LUA": "", "THREADS_TOKEN_KEIBA": "b", "GH_PAT": "x"})
 log = (r.parent / "gh.log").read_text()
 check("IG_TOKEN_*・THREADS_TOKEN_* を全部延長", "IG_TOKEN_LUA" in log and "THREADS_TOKEN_KEIBA" in log and "GH_PAT" not in log, (p.stdout, log))
+def g2(self):
+    if "/access_token" in self.path and "th_exchange_token" in self.path:
+        if "SHORT" in self.path: return self._send(200, {"access_token": "LONG", "expires_in": 5184000})
+        return self._send(400, {"error": {"message": "not short-lived"}})
+    return g(self)
+H.do_GET = g2
+(r.parent / "gh.log").write_text("")
+p = run(r, "scripts/refresh_tokens.py", env={"PATH": f"{fake}:{os.environ['PATH']}", "IG_TOKEN_LUA": "", "THREADS_TOKEN_UMATARO": "SHORT", "THREADS_TOKEN_KEIBA": "b", "THREADS_APP_SECRET": "s", "GH_PAT": "x"})
+log = (r.parent / "gh.log").read_text()
+check("Threadsの短期トークンは長期に交換・長期のものはふつうに延長", "THREADS_TOKEN_UMATARO --body LONG" in log and "THREADS_TOKEN_KEIBA --body NEW" in log and p.returncode == 0, (p.stdout, log))
+H.do_GET = g
 
 # 11 汎用の入口 add_post.py
 r = setup()
