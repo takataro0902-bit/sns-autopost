@@ -1,14 +1,20 @@
 {
- "publish_at": "2026-10-14T21:27:00+09:00",
- "account": "umataro",
- "type": "carousel",
- "media": [
-  "01.jpg",
-  "02.jpg"
- ],
- "caption": "🏁【函館競馬場】2コース\n\n・芝1200m：函館スプリントS\n・芝2000m：函館記念\n\n※画像を押すと大きく見られます",
- "title": "course3v10hakodate",
- "platforms": [
-  "discord"
- ]
+  "publish_at": "2026-10-14T21:27:00+09:00",
+  "account": "umataro",
+  "type": "carousel",
+  "media": [
+    "01.jpg",
+    "02.jpg"
+  ],
+  "caption": "🏁【函館競馬場】2コース\n\n・芝1200m：函館スプリントS\n・芝2000m：函館記念\n\n※画像を押すと大きく見られます",
+  "title": "course3v10hakodate",
+  "platforms": [
+    "discord"
+  ],
+  "result": {
+    "discord": {
+      "id": "1559913008673857578",
+      "at": "2026-10-14T12:57:23.307944+00:00"
+    }
+  }
 }

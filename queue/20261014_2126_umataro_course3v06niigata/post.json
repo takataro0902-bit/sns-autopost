@@ -1,16 +1,22 @@
 {
- "publish_at": "2026-10-14T21:23:00+09:00",
- "account": "umataro",
- "type": "carousel",
- "media": [
-  "01.jpg",
-  "02.jpg",
-  "03.jpg",
-  "04.jpg"
- ],
- "caption": "🏁【新潟競馬場】4コース\n\n・芝1000m：アイビスサマーダッシュ\n・芝1600m（外回り）：関屋記念\n・芝2000m（外回り）：新潟記念\n・ダート1800m：レパードS\n\n※画像を押すと大きく見られます",
- "title": "course3v06niigata",
- "platforms": [
-  "discord"
- ]
+  "publish_at": "2026-10-14T21:23:00+09:00",
+  "account": "umataro",
+  "type": "carousel",
+  "media": [
+    "01.jpg",
+    "02.jpg",
+    "03.jpg",
+    "04.jpg"
+  ],
+  "caption": "🏁【新潟競馬場】4コース\n\n・芝1000m：アイビスサマーダッシュ\n・芝1600m（外回り）：関屋記念\n・芝2000m（外回り）：新潟記念\n・ダート1800m：レパードS\n\n※画像を押すと大きく見られます",
+  "title": "course3v06niigata",
+  "platforms": [
+    "discord"
+  ],
+  "result": {
+    "discord": {
+      "id": "1559912992886497452",
+      "at": "2026-10-14T12:57:19.810220+00:00"
+    }
+  }
 }
