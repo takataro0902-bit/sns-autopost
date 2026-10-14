@@ -19,7 +19,7 @@ import sys
 import traceback
 from datetime import timedelta
 
-from common import CONFIG, QUEUE, ApiError, NotReady, log, now_utc, parse_time, platforms_of
+from common import CONFIG, QUEUE, ApiError, NotReady, log, media_url, now_utc, parse_time, platforms_of, url_is_reachable
 from platforms import PLATFORMS
 
 
@@ -70,7 +70,9 @@ def main():
                 save(d, post)
                 continue
             if args.dry_run:
-                log(f"[お試し] {d.name} を {platform} に投稿します（{post['type']}・{len(post['media'])}点）")
+                ng = [f for f in post["media"] if not url_is_reachable(media_url(d, f))]
+                state = "画像URLはすべて開けます" if not ng else f"開けない画像URLあり：{', '.join(ng)}"
+                log(f"[お試し] {d.name} を {platform} に投稿します（{post['type']}・{len(post['media'])}点・{state}）")
                 continue
             log(f"投稿します：{d.name} → {platform}")
             try:
