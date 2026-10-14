@@ -23,6 +23,7 @@
 | Instagram 形式 | 画像はJPEGのみ・8MB・縦横比4:5〜1.91:1・幅320〜1440。カルーセル10点まで。リール3秒〜15分・300MB | 同「Content publishing」「IG User Media」 |
 | Instagram トークン | 60日有効。作って24時間以上たてば延長できる（この仕組みが毎週月曜に自動で延長） | 同「Business Login」「Get started」 |
 | Threads API | 24時間で250件。カルーセル2〜20点。本文500字まで。リンク5個まで | developers.facebook.com/docs/threads |
+| Discord（ウェブフック） | ボット・審査不要で、URLを知っていれば指定チャンネルに投稿できる。料金の記載は公式ページになし（未確認だが、API利用料の仕組み自体が見当たらない）。本文2000字まで。添付は1ファイル既定20MiBまで（サーバーのブースト等で増える）。1通の添付上限は公式に記載が見当たらず、この仕組みは10点ずつに分けて送る | docs.discord.com「Webhook」「Reference › Uploading Files」、support.discord.com「Intro to Webhooks」 |
 | X API | 月額なしの従量制。1投稿0.015ドル、URL入りは0.20ドル。カード登録で20ドル分のクレジット | docs.x.com「Pricing」 |
 
 注意：GitHubの定期実行は混雑時に数分〜十数分遅れることがあります。13:00の予約は、だいたい13:00〜13:30の間に出ます。
@@ -60,7 +61,7 @@
 | `GH_PAT` | トークン自動延長用（下の作り方）。全事業で1つ |
 | `THREADS_APP_SECRET` | Threadsを使うときだけ。MetaアプリのThreads用のアプリシークレット。全事業で1つ |
 
-名前のきまり：`IG_TOKEN_<事業の略>`（Instagram）、`THREADS_TOKEN_<事業の略>`（Threads）。略は `config.json` の accounts の名前を大文字にしたもの（例：lua → LUA）。
+名前のきまり：`IG_TOKEN_<事業の略>`（Instagram）、`THREADS_TOKEN_<事業の略>`（Threads）、`DISCORD_WEBHOOK_<事業の略>_<チャンネル名>`（Discord。中身はウェブフックURL）。略は `config.json` の accounts の名前を大文字にしたもの（例：lua → LUA）。
 
 `GH_PAT` の作り方：右上のアイコン →「設定（Settings）」→「開発者設定（Developer settings）」→「個人用アクセストークン（Personal access tokens）」→「きめ細かいトークン（Fine-grained tokens）」→「新しいトークンを生成（Generate new token）」
 - リポジトリへのアクセス（Repository access）：`sns-autopost` だけ
@@ -75,6 +76,13 @@ Claudeがテスト用の投稿を1本用意し、本人の了解を取ってか�
 ## 事業やSNSを足すとき
 - **事業を足す**：`config.json` の `accounts` に1行足す（例：`"keiba": {"name": "競馬予想", "platforms": ["instagram"]}`）→ 本人が2・3の手順でトークンを作り `IG_TOKEN_KEIBA` を入れる。Claudeが3つのワークフロー（予約投稿・設定の確認・トークン延長）にそのトークンの行を足す
 - **Threadsを足す**：Metaのアプリに「Threads APIにアクセス」の用途を追加（足せなければ同じFacebookでThreads用のアプリを別に作る）→ Threadsのアカウントを「Threadsテスター」に招待し、Threadsアプリ側で承認 →「グラフAPIエクスプローラ」でThreadsのトークンを作り `THREADS_TOKEN_<事業の略>` で入れる。あわせてThreadsのアプリシークレットを `THREADS_APP_SECRET`（全事業で1つ）で入れる → Claudeが「トークン延長」を動かすと、1時間で切れる短期トークンが60日の長期トークンに交換される（作ってから1時間以内に動かす必要あり）→ その事業の `platforms` に `threads` を足す
+- **Discordのチャンネルを足す**：
+  1. Discordでサーバー名をクリック →「サーバー設定（Server Settings）」→「連携サービス（Integrations）」→「ウェブフック（Webhooks）」→「新しいウェブフック（New Webhook）」
+  2. できたウェブフックを開き、名前（投稿者として表示される。例：馬太郎）・アイコン・「チャンネル（Channel）」で投稿先を選ぶ →「変更を保存（Save Changes）」
+  3. 「ウェブフックURLをコピー（Copy Webhook URL）」→ GitHubの Secrets に `DISCORD_WEBHOOK_<事業の略>_<チャンネル名>` で入れる（例：`DISCORD_WEBHOOK_UMATARO_MAIN`）。**URLはチャットに貼らない**（知っている人は誰でもそのチャンネルに書き込めるため）
+  4. Claudeが `config.json` の `discord_channels` にチャンネル名を足し、ワークフロー（予約投稿・設定の確認）にその行を足す
+  - 投稿は post.json の `platforms` に `discord` を入れたものだけ（Instagramの投稿が勝手にサロンに流れることはない）。任意で `discord_channel`（どのチャンネルか）、`discord_caption`（Discord用の本文）、`discord_mention: "everyone"`（@everyoneで通知）、`discord_username`（表示名の上書き）
+  - 画像はDiscordに直接アップロードするので、後片付けで media ブランチから消えても表示は残る
 - **X**：未対応（従量課金。料金は上の表）
 
 ## ほかのプロジェクトから使う（各事業のClaude向け）
@@ -104,7 +112,7 @@ Claudeがテスト用の投稿を1本用意し、本人の了解を取ってか�
 - `queue/<日付_時刻_事業_ID>/post.json`（main）：1投稿の中身と結果（書き方は `scripts/publish.py` の先頭）
 - `queue/<日付_時刻_事業_ID>/01.jpg など`（media ブランチ）：画像・動画。GitHub Pagesで公開し、APIが取りに来る
 - `scripts/publish.py`：時間が来た投稿を公開する（3回失敗、または予定から3時間過ぎたら諦めてメール。画像URLの準備待ちは失敗に数えない。投稿済みなのに記録が残らなかったときは二重に出さない）
-- `scripts/platforms.py`：Instagram・Threadsへの投稿処理
+- `scripts/platforms.py`：Instagram・Threads・Discordへの投稿処理
 - `scripts/refresh_tokens.py`：毎週月曜に、Secretsの `IG_TOKEN_*`・`THREADS_TOKEN_*` をすべて延長
 - `scripts/cleanup.py`：毎週日曜3時に、済んだ投稿の画像・動画を media ブランチから消し、ブランチを1コミットに作り直す
 - `scripts/check.py`：設定の確認（投稿はしない）

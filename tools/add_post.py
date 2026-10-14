@@ -10,6 +10,9 @@
 ・画像1枚なら image、2〜10枚なら carousel、mp4 ならリール
 ・画像なしで --platforms threads にすると、Threadsの文字だけの投稿（500字まで）
   例：python3 tools/add_post.py --account umataro --platforms threads --at "2026-10-18 09:00" --id yoso1018 --caption-file yoso.txt
+・--platforms discord でDiscordのチャンネルへ（画像あり・文字だけどちらも可。本文2000字まで）
+  チャンネルは --discord-channel（config の discord_channels の名前。省略時は最初のもの）。@everyone で知らせるなら --mention-everyone
+  例：python3 tools/add_post.py --account umataro --platforms discord --at "2026-10-18 08:00" --id salon1018 --caption-file s.txt 01.png
 ・日時は日本時間。post.json は ./queue に、画像・動画は ./media（media ブランチ）に置く
 ・終わったら media → main の順に commit・push する（最後に表示されるコマンド）
 """
@@ -51,6 +54,8 @@ def main():
     g.add_argument("--caption")
     g.add_argument("--caption-file")
     ap.add_argument("--platforms", default="", help="例：instagram,threads（省略時は config の設定）")
+    ap.add_argument("--discord-channel", default="", help="Discordの投稿先（config の discord_channels の名前）")
+    ap.add_argument("--mention-everyone", action="store_true", help="Discordで @everyone を付けて通知する")
     ap.add_argument("--force", action="store_true", help="同じ予約があれば作り直す（投稿済みは触らない）")
     ap.add_argument("files", nargs="*", help="画像・動画・zip（Threadsの文字だけの投稿なら不要）")
     args = ap.parse_args()
@@ -62,10 +67,25 @@ def main():
     if when <= datetime.now():
         print("注意：過去の日時です。3時間以内なら次の回ですぐ投稿され、それより前なら投稿されません")
     caption = args.caption if args.caption is not None else Path(args.caption_file).read_text(encoding="utf-8").strip()
-    if len(caption) > 2200:
+    platforms = args.platforms.split(",") if args.platforms else accounts[args.account]["platforms"]
+    ig = "instagram" in platforms
+    if ig and len(caption) > 2200:
         sys.exit(f"本文が{len(caption)}字です。Instagramは2,200字まで")
-    if len(re.findall(r"#\S+", caption)) > 30:
+    if ig and len(re.findall(r"#\S+", caption)) > 30:
         sys.exit("ハッシュタグが30個を超えています（Instagramは30個まで）")
+    extra = {}
+    if "discord" in platforms:
+        chans = accounts[args.account].get("discord_channels") or {}
+        if not chans:
+            sys.exit(f"config.json の accounts.{args.account} に discord_channels がありません")
+        if args.discord_channel and args.discord_channel not in chans:
+            sys.exit(f"discord_channels にないチャンネルです：{args.discord_channel}（あるもの：{', '.join(chans)}）")
+        if len(caption) + (10 if args.mention_everyone else 0) > 2000:
+            sys.exit(f"本文が{len(caption)}字です。Discordは2000字まで")
+        if args.discord_channel:
+            extra["discord_channel"] = args.discord_channel
+        if args.mention_everyone:
+            extra["discord_mention"] = "everyone"
 
     slug = re.sub(r"[^A-Za-z0-9_-]", "", args.id) or "post"
     name = f"{when:%Y%m%d_%H%M}_{args.account}_{slug}"
@@ -78,17 +98,16 @@ def main():
         if not args.force:
             sys.exit(f"{name} はもう入っています。作り直すなら --force")
 
-    platforms = args.platforms.split(",") if args.platforms else accounts[args.account]["platforms"]
     if not args.files:
-        if platforms != ["threads"]:
-            sys.exit("画像・動画がありません（文字だけの投稿は --platforms threads のときだけ）")
-        if len(caption) > 500:
+        if not set(platforms) <= {"threads", "discord"}:
+            sys.exit("画像・動画がありません（文字だけの投稿は --platforms threads / discord のときだけ）")
+        if "threads" in platforms and len(caption) > 500:
             sys.exit(f"本文が{len(caption)}字です。Threadsは500字まで")
         post = {"publish_at": f"{when:%Y-%m-%dT%H:%M:00}{TZ}", "account": args.account, "type": "text",
-                "media": [], "caption": caption, "title": args.id, "platforms": platforms}
+                "media": [], "caption": caption, "title": args.id, "platforms": platforms, **extra}
         d.mkdir(parents=True, exist_ok=True)
         pj.write_text(json.dumps(post, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        print(f"入れました：{name}（Threadsの文字だけ・{len(caption)}字）")
+        print(f"入れました：{name}（{'・'.join(platforms)}の文字だけ・{len(caption)}字）")
         print("次に：git add queue && git commit -m 予約 && git push")
         return
 
@@ -110,11 +129,11 @@ def main():
             (md / "01.mp4").write_bytes(vids[0][1])
             media, kind = ["01.mp4"], "reel"
         else:
-            if len(imgs) > 10:
+            if ig and len(imgs) > 10:
                 raise ValueError(f"画像が{len(imgs)}枚あります。Instagramは10枚まで")
             media = []
             for i, (_, data) in enumerate(imgs, 1):
-                (md / f"{i:02d}.jpg").write_bytes(to_jpeg(data))
+                (md / f"{i:02d}.jpg").write_bytes(to_jpeg(data, check_ratio=ig))
                 media.append(f"{i:02d}.jpg")
             kind = "image" if len(media) == 1 else "carousel"
     except ValueError as e:
@@ -122,7 +141,7 @@ def main():
         sys.exit(f"入れられません：{e}")
 
     post = {"publish_at": f"{when:%Y-%m-%dT%H:%M:00}{TZ}", "account": args.account, "type": kind,
-            "media": media, "caption": caption, "title": args.id}
+            "media": media, "caption": caption, "title": args.id, **extra}
     if args.platforms:
         post["platforms"] = args.platforms.split(",")
     d.mkdir(parents=True, exist_ok=True)

@@ -11,7 +11,10 @@
       "platforms": [
         "instagram",
         "threads"
-      ]
+      ],
+      "discord_channels": {
+        "main": "サロンの最初のチャンネル（名前はあとで実際のものに）"
+      }
     }
   },
   "timezone_offset": "+09:00",

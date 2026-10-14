@@ -1,8 +1,12 @@
 """設定の確認用。アカウントごとにトークンが使えるか、アカウント名、24時間の投稿枠を表示する（投稿はしない）。"""
+import json
 import os
 import subprocess
+import urllib.request
 
-from common import CONFIG, IG_HOST, TH_HOST, ApiError, http, log, media_base_url, token, url_is_reachable
+from common import (CONFIG, IG_HOST, TH_HOST, ApiError, discord_webhook, http, log, media_base_url, token,
+                    url_is_reachable)
+from platforms import DISCORD_UA
 
 
 def main():
@@ -33,6 +37,17 @@ def main():
                     log(f"{label} Threads：OK  @{me.get('username')}  24時間の投稿枠 {lim}")
             except ApiError as e:
                 log(f"{label} {platform}：NG {e}")
+        for ch, desc in (conf.get("discord_channels") or {}).items():
+            try:
+                url = discord_webhook(acc, ch)
+                req = urllib.request.Request(url, headers={"User-Agent": DISCORD_UA})
+                with urllib.request.urlopen(req, timeout=30) as r:
+                    w = json.loads(r.read().decode())
+                log(f"{label} Discord「{ch}」（{desc}）：OK  ウェブフック名「{w.get('name')}」チャンネルID {w.get('channel_id')}")
+            except ApiError as e:
+                log(f"{label} Discord「{ch}」：NG {e}")
+            except Exception as e:
+                log(f"{label} Discord「{ch}」：NG URLが使えません（消された・コピー違いなど）{type(e).__name__}")
 
 
 if __name__ == "__main__":
