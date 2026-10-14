@@ -34,9 +34,14 @@ MAX_VIDEO = 95 * 1024 * 1024
 
 def ensure_media_worktree():
     """media ブランチを ./media に取り出す（なければ空のブランチを作る）"""
-    if (MEDIA / ".git").exists():
-        return
     git = ["git", "-C", str(ROOT)]
+    if (MEDIA / ".git").exists():
+        # 後片付けで media ブランチは毎週作り直される（force push）ので、手元を最新に合わせる
+        if subprocess.run(["git", "-C", str(MEDIA), "status", "--porcelain"], capture_output=True, text=True).stdout.strip():
+            sys.exit("./media に未コミットの変更があります。先に commit・push してください")
+        subprocess.run(git + ["fetch", "origin", "+refs/heads/media:refs/remotes/origin/media"], check=True)
+        subprocess.run(["git", "-C", str(MEDIA), "reset", "-q", "--hard", "origin/media"], check=True)
+        return
     has_remote = subprocess.run(git + ["fetch", "origin", "+refs/heads/media:refs/remotes/origin/media"], capture_output=True).returncode == 0
     if has_remote:
         subprocess.run(git + ["worktree", "add", "-B", "media", str(MEDIA), "origin/media"], check=True)
