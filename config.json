@@ -5,6 +5,13 @@
       "platforms": [
         "instagram"
       ]
+    },
+    "umataro": {
+      "name": "馬太郎（競馬予想）",
+      "platforms": [
+        "instagram",
+        "threads"
+      ]
     }
   },
   "timezone_offset": "+09:00",

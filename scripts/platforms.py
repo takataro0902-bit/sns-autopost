@@ -40,6 +40,8 @@ def post_instagram(post_dir, post):
     user = http("GET", f"{base}/me", {"fields": "user_id", "access_token": token})["user_id"]
     caption = post["caption"]
     kind = post["type"]
+    if kind == "text":
+        raise ApiError("Instagramは文字だけの投稿ができません（画像か動画が必要）")
     files = post["media"]
     urls = [media_url(post_dir, f) for f in files]
     _check_urls(urls)
@@ -126,7 +128,9 @@ def post_threads(post_dir, post):
             p.update(media_type="IMAGE", image_url=u)
         return p
 
-    if kind == "carousel":
+    if kind == "text":
+        container = create({"media_type": "TEXT", "text": text})
+    elif kind == "carousel":
         urls = urls[:20]  # Threadsのカルーセルは2〜20枚
         children = []
         for i, u in enumerate(urls, 1):

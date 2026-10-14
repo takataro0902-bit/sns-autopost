@@ -12,6 +12,8 @@ jobs:
           # 事業を足したら、ここにその事業のトークンを1行ずつ足す（Claudeがやります）
           IG_TOKEN_LUA: ${{ secrets.IG_TOKEN_LUA }}
           THREADS_TOKEN_LUA: ${{ secrets.THREADS_TOKEN_LUA }}
+          IG_TOKEN_UMATARO: ${{ secrets.IG_TOKEN_UMATARO }}
+          THREADS_TOKEN_UMATARO: ${{ secrets.THREADS_TOKEN_UMATARO }}
           MEDIA_BASE_URL: ${{ vars.MEDIA_BASE_URL }}
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: python3 scripts/check.py

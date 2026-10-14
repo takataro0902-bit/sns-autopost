@@ -153,7 +153,18 @@ check("add_post：zip→カルーセル・mp4→リール・知らない事業�
       j1["type"] == "carousel" and j1["media"] == ["01.jpg", "02.jpg"] and j1["caption"] == "本文\n#a #b" and j1["publish_at"] == "2099-01-02T20:00:00+09:00"
       and j2["type"] == "reel" and (r / "media" / "queue" / "20990102_2100_lua_r1" / "01.mp4").exists() and p3.returncode != 0,
       (p1.stdout, p1.stderr, p2.stderr, p3.stderr))
+p5 = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "threads", "--at", "2099-01-03 09:00", "--id", "yoso", "--caption", "今日の予想")
+j5 = json.loads((r / "queue" / "20990103_0900_umataro_yoso" / "post.json").read_text())
+p6 = run(r, "tools/add_post.py", "--account", "umataro", "--at", "2099-01-03 10:00", "--id", "x", "--caption", "x")
+check("add_post：Threadsの文字だけの投稿・Instagram込みなら画像必須", j5["type"] == "text" and j5["media"] == [] and p6.returncode != 0, (p5.stderr, p6.stderr))
 p4 = run(r, "tools/list_queue.py")
 check("list_queue：予約が見える", "c1" in p4.stdout and "lua" in p4.stdout, p4.stdout + p4.stderr)
+
+# 12 Threadsの文字だけの投稿を出す
+STATE.update(calls=[], existing=[], fail_create=False)
+r = setup(); d = add_post(r, "20261020_1300_umataro_t", account="umataro", type="text", media=[], caption="予想です", platforms=["threads"])
+p = run(r, "scripts/publish.py", env={"THREADS_TOKEN_UMATARO": "t"})
+posts = [c[2] for c in STATE["calls"] if c[0] == "POST" and c[1].endswith("/me/threads")]
+check("Threadsの文字だけの投稿", result(d)["threads"].get("id") and posts and posts[0].get("media_type") == ["TEXT"], (p.stdout, posts))
 
 print("\n全部OK" if ok else "\nNGあり"); sys.exit(0 if ok else 1)

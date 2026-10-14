@@ -8,6 +8,8 @@
 
 ・画像（PNG/JPEG）は並べた順に投稿する。zip を渡すと中の画像を名前順に使う（preview を含む名前は除く）
 ・画像1枚なら image、2〜10枚なら carousel、mp4 ならリール
+・画像なしで --platforms threads にすると、Threadsの文字だけの投稿（500字まで）
+  例：python3 tools/add_post.py --account umataro --platforms threads --at "2026-10-18 09:00" --id yoso1018 --caption-file yoso.txt
 ・日時は日本時間。post.json は ./queue に、画像・動画は ./media（media ブランチ）に置く
 ・終わったら media → main の順に commit・push する（最後に表示されるコマンド）
 """
@@ -50,7 +52,7 @@ def main():
     g.add_argument("--caption-file")
     ap.add_argument("--platforms", default="", help="例：instagram,threads（省略時は config の設定）")
     ap.add_argument("--force", action="store_true", help="同じ予約があれば作り直す（投稿済みは触らない）")
-    ap.add_argument("files", nargs="+", help="画像・動画・zip")
+    ap.add_argument("files", nargs="*", help="画像・動画・zip（Threadsの文字だけの投稿なら不要）")
     args = ap.parse_args()
 
     accounts = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))["accounts"]
@@ -75,6 +77,20 @@ def main():
             sys.exit(f"{name} は投稿済みなので触りません")
         if not args.force:
             sys.exit(f"{name} はもう入っています。作り直すなら --force")
+
+    platforms = args.platforms.split(",") if args.platforms else accounts[args.account]["platforms"]
+    if not args.files:
+        if platforms != ["threads"]:
+            sys.exit("画像・動画がありません（文字だけの投稿は --platforms threads のときだけ）")
+        if len(caption) > 500:
+            sys.exit(f"本文が{len(caption)}字です。Threadsは500字まで")
+        post = {"publish_at": f"{when:%Y-%m-%dT%H:%M:00}{TZ}", "account": args.account, "type": "text",
+                "media": [], "caption": caption, "title": args.id, "platforms": platforms}
+        d.mkdir(parents=True, exist_ok=True)
+        pj.write_text(json.dumps(post, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(f"入れました：{name}（Threadsの文字だけ・{len(caption)}字）")
+        print("次に：git add queue && git commit -m 予約 && git push")
+        return
 
     ensure_media_worktree()
     items = collect(args.files)
