@@ -7,5 +7,11 @@
   "title": "course2v00intro",
   "platforms": [
     "discord"
-  ]
+  ],
+  "result": {
+    "discord": {
+      "id": "1559804364544147485",
+      "at": "2026-10-14T05:45:40.469020+00:00"
+    }
+  }
 }
