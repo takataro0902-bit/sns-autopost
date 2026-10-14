@@ -10,5 +10,11 @@
   "title": "course10hakodate",
   "platforms": [
     "discord"
-  ]
+  ],
+  "result": {
+    "discord": {
+      "id": "1559785193953558630",
+      "at": "2026-10-14T04:29:30.405621+00:00"
+    }
+  }
 }

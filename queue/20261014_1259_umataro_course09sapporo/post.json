@@ -12,5 +12,11 @@
   "title": "course09sapporo",
   "platforms": [
     "discord"
-  ]
+  ],
+  "result": {
+    "discord": {
+      "id": "1559785183295836265",
+      "at": "2026-10-14T04:29:28.111516+00:00"
+    }
+  }
 }

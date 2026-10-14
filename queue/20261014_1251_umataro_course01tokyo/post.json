@@ -17,5 +17,11 @@
   "title": "course01tokyo",
   "platforms": [
     "discord"
-  ]
+  ],
+  "result": {
+    "discord": {
+      "id": "1559785066786324583",
+      "at": "2026-10-14T04:28:59.806266+00:00"
+    }
+  }
 }
