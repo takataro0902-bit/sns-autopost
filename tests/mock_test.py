@@ -30,7 +30,9 @@ threading.Thread(target=srv.serve_forever, daemon=True).start()
 base = f"http://127.0.0.1:{port}"
 
 def setup():
-    tmp = Path(tempfile.mkdtemp()); repo = tmp / "repo"; shutil.copytree(KIT, repo, ignore=shutil.ignore_patterns(".git"))
+    tmp = Path(tempfile.mkdtemp()); repo = tmp / "repo"; shutil.copytree(KIT, repo, ignore=shutil.ignore_patterns(".git", "media", "__pycache__"))
+    for d in (repo / "queue").iterdir():  # 本物の予約はテストに持ち込まない
+        if d.is_dir(): shutil.rmtree(d)
     return repo
 
 def run(repo, script, *args, env=None):
