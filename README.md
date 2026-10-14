@@ -58,6 +58,7 @@
 |---|---|
 | `IG_TOKEN_LUA` | LUA GINZAのInstagramのトークン（2でコピーしたもの） |
 | `GH_PAT` | トークン自動延長用（下の作り方）。全事業で1つ |
+| `THREADS_APP_SECRET` | Threadsを使うときだけ。MetaアプリのThreads用のアプリシークレット。全事業で1つ |
 
 名前のきまり：`IG_TOKEN_<事業の略>`（Instagram）、`THREADS_TOKEN_<事業の略>`（Threads）。略は `config.json` の accounts の名前を大文字にしたもの（例：lua → LUA）。
 
@@ -73,7 +74,7 @@ Claudeがテスト用の投稿を1本用意し、本人の了解を取ってか�
 
 ## 事業やSNSを足すとき
 - **事業を足す**：`config.json` の `accounts` に1行足す（例：`"keiba": {"name": "競馬予想", "platforms": ["instagram"]}`）→ 本人が2・3の手順でトークンを作り `IG_TOKEN_KEIBA` を入れる。Claudeが3つのワークフロー（予約投稿・設定の確認・トークン延長）にそのトークンの行を足す
-- **Threadsを足す**：Metaのアプリに「Threads APIにアクセス」の用途を追加 → トークンを `THREADS_TOKEN_<事業の略>` で入れる → その事業の `platforms` に `threads` を足す
+- **Threadsを足す**：Metaのアプリに「Threads APIにアクセス」の用途を追加（足せなければ同じFacebookでThreads用のアプリを別に作る）→ Threadsのアカウントを「Threadsテスター」に招待し、Threadsアプリ側で承認 →「グラフAPIエクスプローラ」でThreadsのトークンを作り `THREADS_TOKEN_<事業の略>` で入れる。あわせてThreadsのアプリシークレットを `THREADS_APP_SECRET`（全事業で1つ）で入れる → Claudeが「トークン延長」を動かすと、1時間で切れる短期トークンが60日の長期トークンに交換される（作ってから1時間以内に動かす必要あり）→ その事業の `platforms` に `threads` を足す
 - **X**：未対応（従量課金。料金は上の表）
 
 ## ほかのプロジェクトから使う（各事業のClaude向け）

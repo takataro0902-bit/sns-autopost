@@ -28,7 +28,9 @@ def main():
                 else:
                     base = f"{TH_HOST}/{CONFIG['threads_api_version']}"
                     me = http("GET", f"{base}/me", {"fields": "id,username", "access_token": tok})
-                    log(f"{label} Threads：OK  @{me.get('username')}")
+                    lim = http("GET", f"{base}/{me.get('id')}/threads_publishing_limit",
+                               {"fields": "config,quota_usage", "access_token": tok})
+                    log(f"{label} Threads：OK  @{me.get('username')}  24時間の投稿枠 {lim}")
             except ApiError as e:
                 log(f"{label} {platform}：NG {e}")
 
