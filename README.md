@@ -83,6 +83,11 @@ Claudeがテスト用の投稿を1本用意し、本人の了解を取ってか�
   4. Claudeが `config.json` の `discord_channels` にチャンネル名を足し、ワークフロー（予約投稿・設定の確認）にその行を足す
   - 投稿は post.json の `platforms` に `discord` を入れたものだけ（Instagramの投稿が勝手にサロンに流れることはない）。任意で `discord_channel`（どのチャンネルか）、`discord_caption`（Discord用の本文）、`discord_mention: "everyone"`（@everyoneで通知）、`discord_username`（表示名の上書き）
   - 画像はDiscordに直接アップロードするので、後片付けで media ブランチから消えても表示は残る
+- **アフィリエイトの守り（post_rules）**：アカウントに `post_rules` を書くと、合わない投稿は予約にも入らず（add_post.py）、入っていても出さずにメールで知らせる（publish.py）。今は `inshoku`（転職ブログ「飲食の次の一歩」）だけに設定
+  - `first_line_prefix`：本文の1行目がこれで始まること（例 `【PR】`。ステマ規制の運用基準で、ハッシュタグに埋もれる・末尾に置く表示は不明瞭とされるため）
+  - `link_domains`：本文に入れてよいURLのドメイン（ASPのリンク・短縮URLを直接貼らず、自分の記事へ誘導する）
+  - `banned_words`：使わない言葉（誇大・断定の表現など）
+  - `platforms` にないSNSへは出さない（Instagramはタイアップ投稿ラベルをAPIで付けられないため、アフィリエイトは公式アプリで手動予約）
 - **X**：未対応（従量課金。料金は上の表）
 
 ## ほかのプロジェクトから使う（各事業のClaude向け）

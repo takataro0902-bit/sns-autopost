@@ -19,7 +19,7 @@ import sys
 import traceback
 from datetime import timedelta
 
-from common import CONFIG, QUEUE, ApiError, NotReady, log, media_url, now_utc, parse_time, platforms_of, url_is_reachable
+from common import CONFIG, QUEUE, ApiError, NotReady, log, media_url, now_utc, parse_time, platforms_of, post_texts, rule_problems, url_is_reachable
 from platforms import PLATFORMS
 
 
@@ -56,6 +56,22 @@ def main():
             targets = platforms_of(post)
         except ApiError as e:
             alerts.append(f"{d.name}: {e}")
+            continue
+        probs = rule_problems(post["account"], targets, post_texts(post))
+        if probs:
+            # 投稿のルール（PR表記など）に合わないものは出さない。直して予約し直すまで止める
+            msg = "投稿のルールに合わないので出しません：" + " / ".join(probs)
+            for platform in targets:
+                r = result.setdefault(platform, {})
+                if r.get("id") or r.get("gave_up"):
+                    continue
+                if args.dry_run:
+                    log(f"[お試し] {d.name} / {platform}：{msg}")
+                    continue
+                r.update(gave_up=True, error=msg[:500])
+                alerts.append(f"{d.name} / {platform}: {msg}")
+            if not args.dry_run:
+                save(d, post)
             continue
         for platform in targets:
             r = result.setdefault(platform, {})

@@ -16,6 +16,7 @@ jobs:
           THREADS_TOKEN_LUA: ${{ secrets.THREADS_TOKEN_LUA }}
           IG_TOKEN_UMATARO: ${{ secrets.IG_TOKEN_UMATARO }}
           THREADS_TOKEN_UMATARO: ${{ secrets.THREADS_TOKEN_UMATARO }}
+          THREADS_TOKEN_INSHOKU: ${{ secrets.THREADS_TOKEN_INSHOKU }}
           THREADS_APP_SECRET: ${{ secrets.THREADS_APP_SECRET }}   # Threadsの短期トークンを長期に交換するときに使う
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: python3 scripts/refresh_tokens.py

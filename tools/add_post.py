@@ -68,6 +68,11 @@ def main():
         print("注意：過去の日時です。3時間以内なら次の回ですぐ投稿され、それより前なら投稿されません")
     caption = args.caption if args.caption is not None else Path(args.caption_file).read_text(encoding="utf-8").strip()
     platforms = args.platforms.split(",") if args.platforms else accounts[args.account]["platforms"]
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from common import rule_problems  # noqa: E402
+    probs = rule_problems(args.account, platforms, [("本文", caption)])
+    if probs:
+        sys.exit("このアカウントの投稿ルールに合わないので入れません：\n- " + "\n- ".join(probs))
     ig = "instagram" in platforms
     if ig and len(caption) > 2200:
         sys.exit(f"本文が{len(caption)}字です。Instagramは2,200字まで")

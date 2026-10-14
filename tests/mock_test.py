@@ -216,4 +216,32 @@ check("add_post：Discordの文字だけ・縦長画像OK・Discord未設定の�
       j7["type"] == "text" and j7["platforms"] == ["discord"] and j7["discord_mention"] == "everyone" and p8.returncode == 0 and p9.returncode != 0,
       (p7.stderr, p8.stdout + p8.stderr, p9.stderr))
 
+# 14 アフィリエイト用の守り（post_rules）
+STATE.update(calls=[], existing=[], fail_create=False, media_ok=True)
+env = {"THREADS_TOKEN_INSHOKU": "t"}
+good = "【PR】月32万円。でも時給にしたら1,000円ちょっとだった\nhttps://inshoku-nextstep.com/ryo-tsuki-shigoto/?utm_source=threads"
+r = setup(); d = add_post(r, "20261020_1300_inshoku_ok", account="inshoku", type="text", media=[], caption=good)
+p = run(r, "scripts/publish.py", env=env)
+check("守り：ルールどおりならThreadsに出る", result(d)["threads"].get("id") and p.returncode == 0, p.stdout)
+bad = {"nopr": "月32万円の話\n【PR】", "link": "【PR】詳しくは https://px.a8.net/svt/ejp?a8mat=x", "short": "【PR】https://bit.ly/abc",
+       "word": "【PR】誰でも必ず入寮できる", "sub": "【PR】https://evil-inshoku-nextstep.com/"}
+STATE.update(calls=[])
+r = setup(); ds = {k: add_post(r, f"20261020_1300_inshoku_{k}", account="inshoku", type="text", media=[], caption=v) for k, v in bad.items()}
+dig = add_post(r, "20261020_1300_inshoku_ig", account="inshoku", type="image", media=["01.jpg"], caption=good, platforms=["instagram"])
+p = run(r, "scripts/publish.py", env=env)
+errs = {k: result(x)["threads"].get("error", "") for k, x in ds.items()}
+check("守り：PRが1行目にない・ASPや短縮のリンク・使わない言葉・似たドメイン・Instagramは出さずに知らせる",
+      all(result(x)["threads"].get("gave_up") for x in ds.values()) and result(dig)["instagram"].get("gave_up")
+      and "1行目" in errs["nopr"] and "a8.net" in errs["link"] and "bit.ly" in errs["short"] and "誰でも" in errs["word"] and "必ず" in errs["word"]
+      and "evil" in errs["sub"] and not any(c[0] == "POST" for c in STATE["calls"]) and p.returncode == 1, (errs, p.stdout))
+r = setup()
+subprocess.run(["git", "init", "-q", "-b", "main", str(r)], check=True)
+subprocess.run(["git", "-C", str(r), "-c", "user.name=x", "-c", "user.email=x@x", "commit", "-q", "--allow-empty", "-m", "init"], check=True)
+pa = run(r, "tools/add_post.py", "--account", "inshoku", "--at", "2099-01-03 21:00", "--id", "ok", "--caption", good)
+pb = run(r, "tools/add_post.py", "--account", "inshoku", "--at", "2099-01-03 22:00", "--id", "ng", "--caption", "【PR】簡単に稼げる")
+pc = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "threads", "--at", "2099-01-03 23:00", "--id", "free", "--caption", "必ず見て https://example.com")
+check("守り：add_post でも入れる前に止める・ルールのない事業には効かない",
+      pa.returncode == 0 and pb.returncode != 0 and "簡単" in pb.stderr and not (r / "queue" / "20990103_2200_inshoku_ng").exists() and pc.returncode == 0,
+      (pa.stderr, pb.stderr, pc.stderr))
+
 print("\n全部OK" if ok else "\nNGあり"); sys.exit(0 if ok else 1)
