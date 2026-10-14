@@ -1,4 +1,7 @@
 """設定の確認用。アカウントごとにトークンが使えるか、アカウント名、24時間の投稿枠を表示する（投稿はしない）。"""
+import os
+import subprocess
+
 from common import CONFIG, IG_HOST, TH_HOST, ApiError, http, log, media_base_url, token, url_is_reachable
 
 
@@ -6,6 +9,11 @@ def main():
     base_url = media_base_url()
     ok = url_is_reachable(base_url + "ok.txt")
     log(f"画像・動画の公開URL：{base_url}  {'OK' if ok else 'NG（Pagesの設定か media ブランチを確認）'}")
+    if not os.environ.get("GH_TOKEN"):
+        log("GH_PAT（トークン自動延長用）：未設定")
+    else:
+        r = subprocess.run(["gh", "secret", "list"], capture_output=True, text=True)
+        log("GH_PAT（トークン自動延長用）：OK" if r.returncode == 0 else f"GH_PAT：NG（権限を確認）{r.stderr.strip()[:200]}")
     for acc, conf in CONFIG["accounts"].items():
         label = f"[{acc}] {conf.get('name', '')}"
         for platform in conf["platforms"]:

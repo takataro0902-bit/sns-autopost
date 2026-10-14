@@ -13,4 +13,5 @@ jobs:
           IG_TOKEN_LUA: ${{ secrets.IG_TOKEN_LUA }}
           THREADS_TOKEN_LUA: ${{ secrets.THREADS_TOKEN_LUA }}
           MEDIA_BASE_URL: ${{ vars.MEDIA_BASE_URL }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: python3 scripts/check.py
