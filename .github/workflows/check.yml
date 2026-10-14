@@ -14,6 +14,7 @@ jobs:
           THREADS_TOKEN_LUA: ${{ secrets.THREADS_TOKEN_LUA }}
           IG_TOKEN_UMATARO: ${{ secrets.IG_TOKEN_UMATARO }}
           THREADS_TOKEN_UMATARO: ${{ secrets.THREADS_TOKEN_UMATARO }}
+          DISCORD_WEBHOOK_UMATARO_MAIN: ${{ secrets.DISCORD_WEBHOOK_UMATARO_MAIN }}
           MEDIA_BASE_URL: ${{ vars.MEDIA_BASE_URL }}
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: python3 scripts/check.py

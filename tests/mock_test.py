@@ -20,7 +20,11 @@ class H(BaseHTTPRequestHandler):
         if u.path.endswith("/media") or u.path.endswith("/threads"): return self._send(200, {"data": STATE["existing"]})
         return self._send(200, {"status_code": "FINISHED", "status": "FINISHED"})
     def do_POST(self):
-        n = int(self.headers.get("Content-Length", 0)); q = parse_qs(self.rfile.read(n).decode())
+        n = int(self.headers.get("Content-Length", 0)); raw = self.rfile.read(n)
+        if "/webhooks/" in self.path:  # Discord（multipart）
+            STATE["calls"].append(("DISCORD", self.path, raw, self.headers.get("User-Agent")))
+            return self._send(200, {"id": f"M{len(STATE['calls'])}"})
+        q = parse_qs(raw.decode())
         u = urlsplit(self.path); STATE["calls"].append(("POST", u.path, q))
         if STATE["fail_create"]: return self._send(400, {"error": {"message": "bad"}})
         return self._send(200, {"id": f"C{len(STATE['calls'])}"})
@@ -36,7 +40,7 @@ def setup():
     return repo
 
 def run(repo, script, *args, env=None):
-    e = dict(os.environ, IG_HOST=base, TH_HOST=base, MEDIA_BASE_URL=base + "/pages/", IG_TOKEN_LUA="tok", THREADS_TOKEN_LUA="t", POLL_INTERVAL="0", FAKE_NOW="2026-10-20T13:05:00+09:00")
+    e = dict(os.environ, IG_HOST=base, TH_HOST=base, DC_HOST=base, MEDIA_BASE_URL=base + "/pages/", IG_TOKEN_LUA="tok", THREADS_TOKEN_LUA="t", POLL_INTERVAL="0", FAKE_NOW="2026-10-20T13:05:00+09:00")
     e.update(env or {})
     return subprocess.run([sys.executable, str(repo / script), *args], env=e, capture_output=True, text=True)
 
@@ -177,5 +181,39 @@ r = setup(); d = add_post(r, "20261020_1300_umataro_t", account="umataro", type=
 p = run(r, "scripts/publish.py", env={"THREADS_TOKEN_UMATARO": "t"})
 posts = [c[2] for c in STATE["calls"] if c[0] == "POST" and c[1].endswith("/me/threads")]
 check("Threadsの文字だけの投稿", result(d)["threads"].get("id") and posts and posts[0].get("media_type") == ["TEXT"], (p.stdout, posts))
+
+# 13 Discord（ウェブフック）
+STATE.update(calls=[], existing=[], fail_create=False, media_ok=True)
+hook = {"DISCORD_WEBHOOK_UMATARO_MAIN": "https://discord.com/api/webhooks/123/SECRETTOKEN"}
+r = setup(); d = add_post(r, "20261020_1300_umataro_d", account="umataro", type="carousel", media=[f"{i:02d}.jpg" for i in range(1, 13)],
+                     caption="今日の予想\n#競馬", platforms=["discord"], discord_mention="everyone")
+p = run(r, "scripts/publish.py", env=hook)
+dc = [c for c in STATE["calls"] if c[0] == "DISCORD"]
+first = dc[0][2] if dc else b""
+check("Discord：12枚は10枚＋2枚に分けて送り、本文は1通目だけ・ハッシュタグ行を外す・@everyone",
+      len(dc) == 2 and result(d)["discord"].get("id") == ",".join(f"M{STATE['calls'].index(c) + 1}" for c in dc)
+      and '"content": "@everyone\\n今日の予想"'.encode() in first and "#競馬".encode() not in first and b'"parse": ["everyone"]' in first
+      and first.count(b'name="files[') == 10 and dc[1][2].count(b'name="files[') == 2 and b'"content"' not in dc[1][2]
+      and dc[0][1] == "/api/webhooks/123/SECRETTOKEN?wait=true" and dc[0][3].startswith("DiscordBot"), (p.stdout, [c[1] for c in dc]))
+STATE.update(calls=[])
+r = setup(); d = add_post(r, "20261020_1300_umataro_e", account="umataro", type="text", media=[], caption="お知らせ", platforms=["discord"])
+p = run(r, "scripts/publish.py", env=hook)
+dc = [c for c in STATE["calls"] if c[0] == "DISCORD"]
+check("Discord：文字だけ・@everyoneなしなら通知を抑える", len(dc) == 1 and result(d)["discord"].get("id") and b'"parse": []' in dc[0][2], (p.stdout, dc))
+r = setup(); d = add_post(r, "20261020_1300_umataro_f", account="umataro", type="text", media=[], caption="x", platforms=["discord"])
+p = run(r, "scripts/publish.py")
+err = result(d)["discord"].get("error", "")
+check("Discord：URLがなければ名前を知らせ、URLはログに出さない", "DISCORD_WEBHOOK_UMATARO_MAIN" in err and "SECRETTOKEN" not in p.stdout + err, err)
+r = setup()
+subprocess.run(["git", "init", "-q", "-b", "main", str(r)], check=True)
+subprocess.run(["git", "-C", str(r), "-c", "user.name=x", "-c", "user.email=x@x", "commit", "-q", "--allow-empty", "-m", "init"], check=True)
+p7 = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "discord", "--at", "2099-01-03 08:00", "--id", "salon", "--caption", "朝のお知らせ", "--mention-everyone")
+j7 = json.loads((r / "queue" / "20990103_0800_umataro_salon" / "post.json").read_text())
+(src / "tall.png").write_bytes(png(1080, 1920))
+p8 = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "discord", "--at", "2099-01-03 09:00", "--id", "tall", "--caption", "縦長", str(src / "tall.png"))
+p9 = run(r, "tools/add_post.py", "--account", "lua", "--platforms", "discord", "--at", "2099-01-03 09:00", "--id", "x", "--caption", "x")
+check("add_post：Discordの文字だけ・縦長画像OK・Discord未設定の事業は断る",
+      j7["type"] == "text" and j7["platforms"] == ["discord"] and j7["discord_mention"] == "everyone" and p8.returncode == 0 and p9.returncode != 0,
+      (p7.stderr, p8.stdout + p8.stderr, p9.stderr))
 
 print("\n全部OK" if ok else "\nNGあり"); sys.exit(0 if ok else 1)

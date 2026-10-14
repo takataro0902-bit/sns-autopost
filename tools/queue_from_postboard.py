@@ -52,14 +52,14 @@ def ensure_media_worktree():
             (MEDIA / name).write_text(body)
 
 
-def to_jpeg(data):
+def to_jpeg(data, check_ratio=True):
     im = Image.open(io.BytesIO(data))
     if im.mode != "RGB":
         bg = Image.new("RGB", im.size, (255, 255, 255))
         bg.paste(im, mask=im.convert("RGBA").split()[-1])
         im = bg
     w, h = im.size
-    if not 0.8 <= w / h <= 1.91:  # Instagramの許容は 4:5〜1.91:1
+    if check_ratio and not 0.8 <= w / h <= 1.91:  # Instagramの許容は 4:5〜1.91:1（Discordだけなら問わない）
         raise ValueError(f"縦横比が範囲外です（{w}x{h}）")
     if w > 1440:
         im = im.resize((1440, round(h * 1440 / w)), Image.LANCZOS)

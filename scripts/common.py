@@ -16,6 +16,7 @@ CONFIG = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
 # テスト時に差し替えられるよう、APIの置き場所は環境変数でも変えられる
 IG_HOST = os.environ.get("IG_HOST", "https://graph.instagram.com")
 TH_HOST = os.environ.get("TH_HOST", "https://graph.threads.net")
+DC_HOST = os.environ.get("DC_HOST", "https://discord.com")
 
 
 class ApiError(Exception):
@@ -65,6 +66,26 @@ def token(platform, account):
     return value
 
 
+def discord_channel(post):
+    """post.json の discord_channel（省略時は config の discord_channels の最初）を返す"""
+    chans = CONFIG["accounts"][account_of(post)].get("discord_channels") or {}
+    ch = post.get("discord_channel") or next(iter(chans), None)
+    if ch not in chans:
+        raise ApiError(f"config.json の accounts.{account_of(post)}.discord_channels にないチャンネルです：{ch}")
+    return ch
+
+
+def discord_webhook(account, channel):
+    """Secretsの名前は DISCORD_WEBHOOK_<アカウント>_<チャンネル>（例：DISCORD_WEBHOOK_UMATARO_MAIN）。
+    中身はDiscordの「ウェブフックURLをコピー」で取ったURL。テスト用に DC_HOST で行き先を差し替えられる"""
+    name = f"DISCORD_WEBHOOK_{account.upper()}_{channel.upper()}"
+    value = os.environ.get(name)
+    if not value:
+        raise ApiError(f"Secrets に {name} がありません")
+    parts = urllib.parse.urlsplit(value)
+    return DC_HOST.rstrip("/") + parts.path
+
+
 def media_base_url():
     """画像・動画を公開するURLの土台。既定は GitHub Pages（https://<owner>.github.io/<repo>/）。"""
     base = os.environ.get("MEDIA_BASE_URL")
@@ -106,8 +127,10 @@ def http(method, url, params=None, timeout=60):
 
 
 def redact(url):
-    """ログにトークンが出ないようにする"""
+    """ログにトークン（DiscordはURLの最後の部分）が出ないようにする"""
     p = urllib.parse.urlsplit(url)
+    if "/webhooks/" in p.path:
+        p = p._replace(path=p.path.rsplit("/", 1)[0] + "/***")
     q = [(k, "***" if "token" in k or "secret" in k else v) for k, v in urllib.parse.parse_qsl(p.query)]
     return urllib.parse.urlunsplit(p._replace(query=urllib.parse.urlencode(q)))
 
