@@ -67,21 +67,30 @@ def token(platform, account):
 
 
 def discord_channel(post):
-    """post.json の discord_channel（省略時は config の discord_channels の最初）を返す"""
+    """post.json の discord_channel（config の discord_channels のキー）を返す。チャンネルが2つ以上ある事業では省略不可"""
     chans = CONFIG["accounts"][account_of(post)].get("discord_channels") or {}
-    ch = post.get("discord_channel") or next(iter(chans), None)
+    ch = post.get("discord_channel")
+    if not ch:
+        if len(chans) != 1:
+            raise ApiError(f"discord_channel を指定してください（あるもの：{', '.join(chans)}）")
+        ch = next(iter(chans))
     if ch not in chans:
         raise ApiError(f"config.json の accounts.{account_of(post)}.discord_channels にないチャンネルです：{ch}")
     return ch
 
 
+def discord_bot_token(account):
+    """Secretsの名前は DISCORD_BOT_TOKEN_<アカウント>（例：DISCORD_BOT_TOKEN_UMATARO）。1つでサーバーの全チャンネルに投稿できる"""
+    return os.environ.get(f"DISCORD_BOT_TOKEN_{account.upper()}")
+
+
 def discord_webhook(account, channel):
-    """Secretsの名前は DISCORD_WEBHOOK_<アカウント>_<チャンネル>（例：DISCORD_WEBHOOK_UMATARO_MAIN）。
+    """Secretsの名前は DISCORD_WEBHOOK_<アカウント>_<チャンネル>（例：DISCORD_WEBHOOK_UMATARO_COURSE）。
     中身はDiscordの「ウェブフックURLをコピー」で取ったURL。テスト用に DC_HOST で行き先を差し替えられる"""
     name = f"DISCORD_WEBHOOK_{account.upper()}_{channel.upper()}"
     value = os.environ.get(name)
     if not value:
-        raise ApiError(f"Secrets に {name} がありません")
+        raise ApiError(f"Secrets に DISCORD_BOT_TOKEN_{account.upper()}（ボット）も {name}（ウェブフック）もありません")
     parts = urllib.parse.urlsplit(value)
     return DC_HOST.rstrip("/") + parts.path
 

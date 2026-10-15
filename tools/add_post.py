@@ -11,8 +11,10 @@
 ・画像なしで --platforms threads にすると、Threadsの文字だけの投稿（500字まで）
   例：python3 tools/add_post.py --account umataro --platforms threads --at "2026-10-18 09:00" --id yoso1018 --caption-file yoso.txt
 ・--platforms discord でDiscordのチャンネルへ（画像あり・文字だけどちらも可。本文2000字まで）
-  チャンネルは --discord-channel（config の discord_channels の名前。省略時は最初のもの）。@everyone で知らせるなら --mention-everyone
-  例：python3 tools/add_post.py --account umataro --platforms discord --at "2026-10-18 08:00" --id salon1018 --caption-file s.txt 01.png
+  チャンネルは --discord-channel（config の discord_channels のキー。例 news・yoso・zento・course。チャンネルが1つの事業だけ省略可）。
+  @everyone で知らせるなら --mention-everyone。投稿にスレッドを付けるなら --discord-thread-name "富士S 質問はこちら"（ボットのみ）。
+  前に出した投稿のスレッドに書くなら --discord-in-thread <そのフォルダ名>
+  例：python3 tools/add_post.py --account umataro --platforms discord --discord-channel news --at "2026-10-18 08:00" --id salon1018 --caption-file s.txt 01.png
 ・日時は日本時間。post.json は ./queue に、画像・動画は ./media（media ブランチ）に置く
 ・終わったら media → main の順に commit・push する（最後に表示されるコマンド）
 """
@@ -54,7 +56,9 @@ def main():
     g.add_argument("--caption")
     g.add_argument("--caption-file")
     ap.add_argument("--platforms", default="", help="例：instagram,threads（省略時は config の設定）")
-    ap.add_argument("--discord-channel", default="", help="Discordの投稿先（config の discord_channels の名前）")
+    ap.add_argument("--discord-channel", default="", help="Discordの投稿先（config の discord_channels のキー）")
+    ap.add_argument("--discord-thread-name", default="", help="Discordで、この投稿にスレッドを作る（その名前）")
+    ap.add_argument("--discord-in-thread", default="", help="Discordで、前に出した投稿（フォルダ名）のスレッドに書く")
     ap.add_argument("--mention-everyone", action="store_true", help="Discordで @everyone を付けて通知する")
     ap.add_argument("--force", action="store_true", help="同じ予約があれば作り直す（投稿済みは触らない）")
     ap.add_argument("files", nargs="*", help="画像・動画・zip（Threadsの文字だけの投稿なら不要）")
@@ -80,12 +84,20 @@ def main():
             sys.exit(f"config.json の accounts.{args.account} に discord_channels がありません")
         if args.discord_channel and args.discord_channel not in chans:
             sys.exit(f"discord_channels にないチャンネルです：{args.discord_channel}（あるもの：{', '.join(chans)}）")
+        if not args.discord_channel and len(chans) > 1:
+            sys.exit("--discord-channel を指定してください：" + "、".join(f"{k}={v}" for k, v in chans.items()))
+        if args.discord_in_thread and not (QUEUE / args.discord_in_thread / "post.json").exists():
+            sys.exit(f"--discord-in-thread のフォルダがありません：{args.discord_in_thread}")
         if len(caption) + (10 if args.mention_everyone else 0) > 2000:
             sys.exit(f"本文が{len(caption)}字です。Discordは2000字まで")
         if args.discord_channel:
             extra["discord_channel"] = args.discord_channel
         if args.mention_everyone:
             extra["discord_mention"] = "everyone"
+        if args.discord_thread_name:
+            extra["discord_thread_name"] = args.discord_thread_name
+        if args.discord_in_thread:
+            extra["discord_in_thread"] = args.discord_in_thread
 
     slug = re.sub(r"[^A-Za-z0-9_-]", "", args.id) or "post"
     name = f"{when:%Y%m%d_%H%M}_{args.account}_{slug}"
