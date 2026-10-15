@@ -18,6 +18,9 @@ def main():
     else:
         r = subprocess.run(["gh", "secret", "list"], capture_output=True, text=True)
         log("GH_PAT（トークン自動延長用）：OK" if r.returncode == 0 else f"GH_PAT：NG（権限を確認）{r.stderr.strip()[:200]}")
+        if r.returncode == 0:  # 名前だけ（中身は出ない）
+            names = [l.split()[0] for l in r.stdout.splitlines() if l.strip()]
+            log("Secretsの名前：" + "、".join(names))
     for acc, conf in CONFIG["accounts"].items():
         label = f"[{acc}] {conf.get('name', '')}"
         for platform in conf["platforms"]:
@@ -59,7 +62,8 @@ def main():
             try:
                 url = discord_webhook(acc, ch)
             except ApiError:
-                continue  # ボットもウェブフックもないチャンネルは、まだ使わないもの
+                log(f"{label} Discord「{ch}」{name}：未設定（DISCORD_WEBHOOK_{acc.upper()}_{ch.upper()}）")
+                continue
             try:
                 req = urllib.request.Request(url, headers={"User-Agent": DISCORD_UA})
                 with urllib.request.urlopen(req, timeout=30) as r:
