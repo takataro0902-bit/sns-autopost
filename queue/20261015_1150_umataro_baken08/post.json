@@ -8,5 +8,11 @@
   "platforms": [
     "discord"
   ],
-  "discord_channel": "baken"
+  "discord_channel": "baken",
+  "result": {
+    "discord": {
+      "id": "1560122680689037393",
+      "at": "2026-10-15T02:50:32.845453+00:00"
+    }
+  }
 }
