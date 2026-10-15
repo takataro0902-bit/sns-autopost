@@ -4,9 +4,9 @@ import os
 import subprocess
 import urllib.request
 
-from common import (CONFIG, IG_HOST, TH_HOST, ApiError, discord_webhook, http, log, media_base_url, token,
+from common import (CONFIG, IG_HOST, TH_HOST, ApiError, discord_bot_token, discord_webhook, http, log, media_base_url, token,
                     url_is_reachable)
-from platforms import DISCORD_UA
+from platforms import DISCORD_UA, _norm, discord_channel_id, discord_guild_channels
 
 
 def main():
@@ -37,18 +37,38 @@ def main():
                     log(f"{label} Threads：OK  @{me.get('username')}  24時間の投稿枠 {lim}")
             except ApiError as e:
                 log(f"{label} {platform}：NG {e}")
-        for ch, desc in (conf.get("discord_channels") or {}).items():
+        chans = conf.get("discord_channels") or {}
+        bot = discord_bot_token(acc)
+        if chans and bot:
+            try:
+                found = discord_guild_channels(bot)
+                log(f"{label} Discordボット：OK  入っているサーバー：{'、'.join(sorted({g for g, _, _ in found})) or 'なし（招待がまだ）'}")
+                for ch, name in chans.items():
+                    try:
+                        log(f"{label} Discord「{ch}」{name}：OK  チャンネルID {discord_channel_id(acc, ch, bot)}")
+                    except ApiError as e:
+                        log(f"{label} Discord「{ch}」{name}：NG {e}")
+                known = {_norm(n) for n in chans.values()}
+                extra = [f"{n}（{cid}）" for _, n, cid in found if _norm(n) not in known]
+                if extra:
+                    log(f"{label} Discord：config にないチャンネル：{'、'.join(extra)}")
+            except ApiError as e:
+                log(f"{label} Discordボット：NG {e}")
+            continue
+        for ch, name in chans.items():
             try:
                 url = discord_webhook(acc, ch)
+            except ApiError:
+                continue  # ボットもウェブフックもないチャンネルは、まだ使わないもの
+            try:
                 req = urllib.request.Request(url, headers={"User-Agent": DISCORD_UA})
                 with urllib.request.urlopen(req, timeout=30) as r:
                     w = json.loads(r.read().decode())
-                log(f"{label} Discord「{ch}」（{desc}）：OK  ウェブフック名「{w.get('name')}」チャンネルID {w.get('channel_id')}")
-            except ApiError as e:
-                log(f"{label} Discord「{ch}」：NG {e}")
+                log(f"{label} Discord「{ch}」{name}（ウェブフック）：OK  ウェブフック名「{w.get('name')}」チャンネルID {w.get('channel_id')}")
             except Exception as e:
                 log(f"{label} Discord「{ch}」：NG URLが使えません（消された・コピー違いなど）{type(e).__name__}")
-
+        if chans and not bot:
+            log(f"{label} Discordボット：未設定（DISCORD_BOT_TOKEN_{acc.upper()}）")
 
 if __name__ == "__main__":
     main()

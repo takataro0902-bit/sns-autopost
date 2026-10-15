@@ -5,7 +5,10 @@ from pathlib import Path
 from urllib.parse import urlsplit, parse_qs
 
 KIT = Path(sys.argv[1]).resolve()
-STATE = {"calls": [], "existing": [], "media_ok": True, "fail_create": False}
+STATE = {"calls": [], "existing": [], "media_ok": True, "fail_create": False,
+         "guild_channels": [{"id": "C1", "name": "📣お知らせ", "type": 0}, {"id": "C2", "name": "🏆重賞の全頭診断", "type": 0},
+                            {"id": "C3", "name": "🎯みんなの予想・的中", "type": 0}, {"id": "C4", "name": "🐎倶楽部コンテンツ", "type": 4},
+                            {"id": "C5", "name": "新しい部屋", "type": 0}]}
 
 class H(BaseHTTPRequestHandler):
     def log_message(self, *a): pass
@@ -16,11 +19,19 @@ class H(BaseHTTPRequestHandler):
         self.send_response(200 if STATE["media_ok"] else 404); self.end_headers()
     def do_GET(self):
         u = urlsplit(self.path); q = parse_qs(u.query); STATE["calls"].append(("GET", u.path, q))
+        if u.path.startswith("/api/v10/"):  # Discordボット
+            STATE["calls"][-1] = ("BOTGET", u.path, self.headers.get("Authorization"))
+            if u.path.endswith("/users/@me/guilds"): return self._send(200, [{"id": "G1", "name": "うま太郎倶楽部"}])
+            if u.path.endswith("/guilds/G1/channels"): return self._send(200, STATE["guild_channels"])
         if u.path.endswith("/me"): return self._send(200, {"user_id": "IG123", "id": "TH1", "username": "lua"})
         if u.path.endswith("/media") or u.path.endswith("/threads"): return self._send(200, {"data": STATE["existing"]})
         return self._send(200, {"status_code": "FINISHED", "status": "FINISHED"})
     def do_POST(self):
         n = int(self.headers.get("Content-Length", 0)); raw = self.rfile.read(n)
+        if self.path.startswith("/api/v10/channels/"):  # Discordボット
+            STATE["calls"].append(("BOT", self.path, raw, self.headers.get("Authorization")))
+            if STATE.get("bot_fail"): return self._send(403, {"message": "Missing Permissions"})
+            return self._send(200, {"id": f"B{len(STATE['calls'])}"})
         if "/webhooks/" in self.path:  # Discord（multipart）
             STATE["calls"].append(("DISCORD", self.path, raw, self.headers.get("User-Agent")))
             return self._send(200, {"id": f"M{len(STATE['calls'])}"})
@@ -184,9 +195,9 @@ check("Threadsの文字だけの投稿", result(d)["threads"].get("id") and post
 
 # 13 Discord（ウェブフック）
 STATE.update(calls=[], existing=[], fail_create=False, media_ok=True)
-hook = {"DISCORD_WEBHOOK_UMATARO_MAIN": "https://discord.com/api/webhooks/123/SECRETTOKEN"}
+hook = {"DISCORD_WEBHOOK_UMATARO_COURSE": "https://discord.com/api/webhooks/123/SECRETTOKEN"}
 r = setup(); d = add_post(r, "20261020_1300_umataro_d", account="umataro", type="carousel", media=[f"{i:02d}.jpg" for i in range(1, 13)],
-                     caption="今日の予想\n#競馬", platforms=["discord"], discord_mention="everyone")
+                     caption="今日の予想\n#競馬", platforms=["discord"], discord_mention="everyone", discord_channel="course")
 p = run(r, "scripts/publish.py", env=hook)
 dc = [c for c in STATE["calls"] if c[0] == "DISCORD"]
 first = dc[0][2] if dc else b""
@@ -196,24 +207,57 @@ check("Discord：12枚は10枚＋2枚に分けて送り、本文は1通目だけ
       and first.count(b'name="files[') == 10 and dc[1][2].count(b'name="files[') == 2 and b'"content"' not in dc[1][2]
       and dc[0][1] == "/api/webhooks/123/SECRETTOKEN?wait=true" and dc[0][3].startswith("DiscordBot"), (p.stdout, [c[1] for c in dc]))
 STATE.update(calls=[])
-r = setup(); d = add_post(r, "20261020_1300_umataro_e", account="umataro", type="text", media=[], caption="お知らせ", platforms=["discord"])
+r = setup(); d = add_post(r, "20261020_1300_umataro_e", account="umataro", type="text", media=[], caption="お知らせ", platforms=["discord"], discord_channel="course")
 p = run(r, "scripts/publish.py", env=hook)
 dc = [c for c in STATE["calls"] if c[0] == "DISCORD"]
 check("Discord：文字だけ・@everyoneなしなら通知を抑える", len(dc) == 1 and result(d)["discord"].get("id") and b'"parse": []' in dc[0][2], (p.stdout, dc))
-r = setup(); d = add_post(r, "20261020_1300_umataro_f", account="umataro", type="text", media=[], caption="x", platforms=["discord"])
+r = setup(); d = add_post(r, "20261020_1300_umataro_f", account="umataro", type="text", media=[], caption="x", platforms=["discord"], discord_channel="course")
 p = run(r, "scripts/publish.py")
 err = result(d)["discord"].get("error", "")
-check("Discord：URLがなければ名前を知らせ、URLはログに出さない", "DISCORD_WEBHOOK_UMATARO_MAIN" in err and "SECRETTOKEN" not in p.stdout + err, err)
+check("Discord：URLがなければ名前を知らせ、URLはログに出さない", "DISCORD_WEBHOOK_UMATARO_COURSE" in err and "DISCORD_BOT_TOKEN_UMATARO" in err and "SECRETTOKEN" not in p.stdout + err, err)
 r = setup()
 subprocess.run(["git", "init", "-q", "-b", "main", str(r)], check=True)
 subprocess.run(["git", "-C", str(r), "-c", "user.name=x", "-c", "user.email=x@x", "commit", "-q", "--allow-empty", "-m", "init"], check=True)
-p7 = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "discord", "--at", "2099-01-03 08:00", "--id", "salon", "--caption", "朝のお知らせ", "--mention-everyone")
+p7 = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "discord", "--at", "2099-01-03 08:00", "--id", "salon", "--caption", "朝のお知らせ", "--mention-everyone", "--discord-channel", "news", "--discord-thread-name", "質問はこちら")
 j7 = json.loads((r / "queue" / "20990103_0800_umataro_salon" / "post.json").read_text())
 (src / "tall.png").write_bytes(png(1080, 1920))
-p8 = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "discord", "--at", "2099-01-03 09:00", "--id", "tall", "--caption", "縦長", str(src / "tall.png"))
+p8 = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "discord", "--at", "2099-01-03 09:00", "--id", "tall", "--caption", "縦長", "--discord-channel", "course", str(src / "tall.png"))
+p10 = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "discord", "--at", "2099-01-03 09:00", "--id", "nochan", "--caption", "x")
 p9 = run(r, "tools/add_post.py", "--account", "lua", "--platforms", "discord", "--at", "2099-01-03 09:00", "--id", "x", "--caption", "x")
-check("add_post：Discordの文字だけ・縦長画像OK・Discord未設定の事業は断る",
-      j7["type"] == "text" and j7["platforms"] == ["discord"] and j7["discord_mention"] == "everyone" and p8.returncode == 0 and p9.returncode != 0,
+check("add_post：Discordの文字だけ・縦長画像OK・Discord未設定の事業は断る・チャンネル省略は断る",
+      j7["type"] == "text" and j7["platforms"] == ["discord"] and j7["discord_mention"] == "everyone" and p8.returncode == 0 and p9.returncode != 0
+      and j7["discord_channel"] == "news" and j7["discord_thread_name"] == "質問はこちら" and p10.returncode != 0 and "news=📣お知らせ" in p10.stderr,
       (p7.stderr, p8.stdout + p8.stderr, p9.stderr))
+
+# 14 Discord（ボット：1つのトークンで全チャンネル）
+STATE.update(calls=[], bot_fail=False)
+bt = {"DISCORD_BOT_TOKEN_UMATARO": "BOTSECRET", **hook}
+r = setup(); d = add_post(r, "20261020_1300_umataro_g", account="umataro", type="carousel", media=["01.jpg"], caption="全頭診断",
+                         platforms=["discord"], discord_channel="zento", discord_thread_name="富士S 質問はこちら")
+d2 = add_post(r, "20261020_1301_umataro_h", account="umataro", type="text", media=[], caption="当日の最終判断", platforms=["discord"],
+              discord_channel="zento", discord_in_thread="20261020_1300_umataro_g")
+d3 = add_post(r, "20261020_1302_umataro_i", account="umataro", type="text", media=[], caption="みんな", platforms=["discord"], discord_channel="minna")
+p = run(r, "scripts/publish.py", env=bt)
+bots = [c for c in STATE["calls"] if c[0] == "BOT"]
+gets = [c for c in STATE["calls"] if c[0] == "BOTGET"]
+check("Discordボット：名前でチャンネルを探して送り、スレッドを作り、そのスレッドに書く・ウェブフックは使わない",
+      [c[1] for c in bots] == ["/api/v10/channels/C2/messages", "/api/v10/channels/C2/messages/" + result(d)["discord"]["id"] + "/threads",
+                               "/api/v10/channels/" + result(d)["discord"]["id"] + "/messages", "/api/v10/channels/C3/messages"]
+      and all(c[-1] == "Bot BOTSECRET" for c in bots + gets) and len(gets) == 2 and "富士S 質問はこちら".encode() in bots[1][2]
+      and result(d2)["discord"].get("id") and result(d3)["discord"].get("id") and not any(c[0] == "DISCORD" for c in STATE["calls"])
+      and "BOTSECRET" not in p.stdout, (p.stdout, [c[1] for c in STATE["calls"]]))
+STATE.update(calls=[], bot_fail=True)
+r = setup(); d = add_post(r, "20261020_1300_umataro_j", account="umataro", type="text", media=[], caption="x", platforms=["discord"], discord_channel="news")
+d2 = add_post(r, "20261020_1300_umataro_k", account="umataro", type="text", media=[], caption="x", platforms=["discord"], discord_channel="kaiko")
+d3 = add_post(r, "20261020_1300_umataro_l", account="umataro", type="text", media=[], caption="x", platforms=["discord"])
+p = run(r, "scripts/publish.py", env=bt)
+check("Discordボット：権限なしは理由を出す・サーバーにない部屋は止める・チャンネル省略は止める",
+      "権限" in result(d)["discord"].get("error", "") and "☁️レース回顧" in result(d2)["discord"].get("error", "")
+      and "discord_channel を指定" in result(d3)["discord"].get("error", ""), (result(d), result(d2), result(d3)))
+STATE.update(calls=[], bot_fail=False)
+r = setup(); p = run(r, "scripts/check.py", env=bt)
+check("設定の確認：ボットでチャンネルIDを出し、configにない部屋も知らせる",
+      "「news」📣お知らせ：OK  チャンネルID C1" in p.stdout and "「kaiko」☁️レース回顧：NG" in p.stdout and "新しい部屋（C5）" in p.stdout
+      and "倶楽部コンテンツ" not in p.stdout.split("configにない")[-1] and "BOTSECRET" not in p.stdout, p.stdout + p.stderr)
 
 print("\n全部OK" if ok else "\nNGあり"); sys.exit(0 if ok else 1)

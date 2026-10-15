@@ -34,7 +34,9 @@ jobs:
           IG_TOKEN_UMATARO: ${{ secrets.IG_TOKEN_UMATARO }}
           THREADS_TOKEN_UMATARO: ${{ secrets.THREADS_TOKEN_UMATARO }}
           THREADS_TOKEN_INSHOKU: ${{ secrets.THREADS_TOKEN_INSHOKU }}
-          DISCORD_WEBHOOK_UMATARO_MAIN: ${{ secrets.DISCORD_WEBHOOK_UMATARO_MAIN }}
+          DISCORD_BOT_TOKEN_UMATARO: ${{ secrets.DISCORD_BOT_TOKEN_UMATARO }}
+          # 🏁コース解説のウェブフック（10/14から使用中。ボットが入れば使わない）
+          DISCORD_WEBHOOK_UMATARO_COURSE: ${{ secrets.DISCORD_WEBHOOK_UMATARO_MAIN }}
           MEDIA_BASE_URL: ${{ vars.MEDIA_BASE_URL }}
           ONLY: ${{ inputs.only }}
           DRY_RUN: ${{ inputs.dry_run }}

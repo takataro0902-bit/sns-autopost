@@ -13,8 +13,21 @@
         "threads"
       ],
       "discord_channels": {
-        "main": "サロンの最初のチャンネル（名前はあとで実際のものに）"
-      }
+        "news": "📣お知らせ",
+        "yoso": "🏇うま太郎の重賞予想",
+        "zento": "🏆重賞の全頭診断",
+        "bias": "🏇今日のトラックバイアス",
+        "course": "🏁コース解説",
+        "baken": "🎫馬券の買い方",
+        "kaiko": "☁️レース回顧",
+        "hajime": "🔰はじめに",
+        "jiko": "👋自己紹介",
+        "taikai": "🚪退会について",
+        "shitsumon": "🙋質問部屋",
+        "minna": "🎯みんなの予想・的中",
+        "zatsudan": "☕雑談"
+      },
+      "discord_channel_ids": {}
     }
   },
   "timezone_offset": "+09:00",
