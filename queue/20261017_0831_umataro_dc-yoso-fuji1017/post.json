@@ -8,5 +8,11 @@
   "platforms": [
     "discord"
   ],
-  "discord_channel": "yoso"
+  "discord_channel": "yoso",
+  "result": {
+    "discord": {
+      "id": "1560802401181503629",
+      "at": "2026-10-16T23:51:30.811251+00:00"
+    }
+  }
 }
