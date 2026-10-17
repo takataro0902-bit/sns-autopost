@@ -8,5 +8,11 @@
   "platforms": [
     "discord"
   ],
-  "discord_channel": "zento"
+  "discord_channel": "zento",
+  "result": {
+    "discord": {
+      "id": "1560976202703970354",
+      "at": "2026-10-17T11:22:08.513437+00:00"
+    }
+  }
 }
