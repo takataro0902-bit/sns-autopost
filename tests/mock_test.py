@@ -24,7 +24,7 @@ class H(BaseHTTPRequestHandler):
             if u.path.endswith("/users/@me/guilds"): return self._send(200, [{"id": "G1", "name": "うま太郎倶楽部"}])
             if u.path.endswith("/guilds/G1/channels"): return self._send(200, STATE["guild_channels"])
         if u.path.endswith("/me"): return self._send(200, {"user_id": "IG123", "id": "TH1", "username": "lua"})
-        if u.path.endswith("/media") or u.path.endswith("/threads"): return self._send(200, {"data": STATE["existing"]})
+        if u.path.endswith("/media") or u.path.endswith("/threads") or u.path.endswith("/replies"): return self._send(200, {"data": STATE["existing"]})
         return self._send(200, {"status_code": "FINISHED", "status": "FINISHED"})
     def do_POST(self):
         n = int(self.headers.get("Content-Length", 0)); raw = self.rfile.read(n)
@@ -259,5 +259,31 @@ r = setup(); p = run(r, "scripts/check.py", env=bt)
 check("設定の確認：ボットでチャンネルIDを出し、configにない部屋も知らせる",
       "「news」📣お知らせ：OK  チャンネルID C1" in p.stdout and "「kaiko」☁️レース回顧：NG" in p.stdout and "新しい部屋（C5）" in p.stdout
       and "倶楽部コンテンツ" not in p.stdout.split("configにない")[-1] and "BOTSECRET" not in p.stdout, p.stdout + p.stderr)
+
+# 16 Threadsの続き（自分の投稿への返信）：親が出てから reply_to_id 付きで出す。親が未投稿なら待つ
+STATE.update(calls=[], existing=[], fail_create=False, media_ok=True)
+r = setup()
+dp = add_post(r, "20261020_1300_umataro_p", account="umataro", type="text", media=[], caption="1本目", platforms=["threads"])
+dc = add_post(r, "20261020_1301_umataro_c", account="umataro", type="text", media=[], caption="続き", platforms=["threads"],
+              threads_reply_to="20261020_1300_umataro_p", publish_at="2026-10-20T13:01:00+09:00")
+p = run(r, "scripts/publish.py", env={"THREADS_TOKEN_UMATARO": "t"})
+creates = [c[2] for c in STATE["calls"] if c[0] == "POST" and c[1].endswith("/me/threads")]
+pid = result(dp)["threads"].get("id")
+check("Threadsの続き：親のあとに reply_to_id 付きで出る", pid and result(dc)["threads"].get("id") and len(creates) == 2
+      and "reply_to_id" not in creates[0] and creates[1].get("reply_to_id") == [pid], (p.stdout, creates))
+STATE.update(calls=[])
+r = setup()
+add_post(r, "20261020_1310_umataro_p2", account="umataro", type="text", media=[], caption="1本目", platforms=["threads"], publish_at="2026-10-20T13:10:00+09:00")
+dc2 = add_post(r, "20261020_1301_umataro_c2", account="umataro", type="text", media=[], caption="続き", platforms=["threads"],
+               threads_reply_to="20261020_1310_umataro_p2", publish_at="2026-10-20T13:01:00+09:00")
+p = run(r, "scripts/publish.py", env={"THREADS_TOKEN_UMATARO": "t"})
+rc = result(dc2)["threads"]
+check("Threadsの続き：親がまだなら失敗に数えず待つ", not rc.get("id") and not rc.get("attempts") and "まだ" in rc.get("error", "") and p.returncode == 0, (p.stdout, rc))
+pa = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "threads", "--at", "2099-01-03 09:00", "--id", "x",
+         "--caption", "続き", "--threads-reply-to", "20261020_1310_umataro_p2")
+pb = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "threads", "--at", "2026-10-20 13:05", "--id", "y",
+         "--caption", "続き", "--threads-reply-to", "20261020_1310_umataro_p2")
+jx = json.loads((r / "queue" / "20990103_0900_umataro_x" / "post.json").read_text()) if pa.returncode == 0 else {}
+check("add_post：--threads-reply-to を書く・親より前の時刻は止める", jx.get("threads_reply_to") == "20261020_1310_umataro_p2" and pb.returncode != 0, (pa.stdout + pa.stderr, pb.stderr))
 
 print("\n全部OK" if ok else "\nNGあり"); sys.exit(0 if ok else 1)
