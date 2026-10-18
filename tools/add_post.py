@@ -15,6 +15,9 @@
   @everyone で知らせるなら --mention-everyone。投稿にスレッドを付けるなら --discord-thread-name "富士S 質問はこちら"（ボットのみ）。
   前に出した投稿のスレッドに書くなら --discord-in-thread <そのフォルダ名>
   例：python3 tools/add_post.py --account umataro --platforms discord --discord-channel news --at "2026-10-18 08:00" --id salon1018 --caption-file s.txt 01.png
+・--threads-reply-to <親のフォルダ名> で、Threadsの「続き」（自分の投稿への返信）として出す。親より1〜2分後の時刻にする
+  例：python3 tools/add_post.py --account umataro --platforms threads --at "2026-10-20 20:01" --id kiku-c1 \
+        --threads-reply-to 20261020_2000_umataro_kiku --caption-file c1.txt
 ・日時は日本時間。post.json は ./queue に、画像・動画は ./media（media ブランチ）に置く
 ・終わったら media → main の順に commit・push する（最後に表示されるコマンド）
 """
@@ -60,6 +63,7 @@ def main():
     ap.add_argument("--discord-thread-name", default="", help="Discordで、この投稿にスレッドを作る（その名前）")
     ap.add_argument("--discord-in-thread", default="", help="Discordで、前に出した投稿（フォルダ名）のスレッドに書く")
     ap.add_argument("--mention-everyone", action="store_true", help="Discordで @everyone を付けて通知する")
+    ap.add_argument("--threads-reply-to", default="", help="Threadsで、前に予約した投稿（フォルダ名）の続き＝自分の返信として出す。親より後の時刻にする")
     ap.add_argument("--force", action="store_true", help="同じ予約があれば作り直す（投稿済みは触らない）")
     ap.add_argument("files", nargs="*", help="画像・動画・zip（Threadsの文字だけの投稿なら不要）")
     args = ap.parse_args()
@@ -98,6 +102,17 @@ def main():
             extra["discord_thread_name"] = args.discord_thread_name
         if args.discord_in_thread:
             extra["discord_in_thread"] = args.discord_in_thread
+
+    if args.threads_reply_to:
+        if platforms != ["threads"]:
+            sys.exit("--threads-reply-to は --platforms threads のときだけ使えます")
+        ppj = QUEUE / args.threads_reply_to / "post.json"
+        if not ppj.exists():
+            sys.exit(f"--threads-reply-to のフォルダがありません：{args.threads_reply_to}")
+        parent_at = datetime.strptime(json.loads(ppj.read_text(encoding="utf-8"))["publish_at"][:16], "%Y-%m-%dT%H:%M")
+        if when <= parent_at:
+            sys.exit(f"続きは親（{parent_at:%m/%d %H:%M}）より後の時刻にしてください（1〜2分後がおすすめ）")
+        extra["threads_reply_to"] = args.threads_reply_to
 
     slug = re.sub(r"[^A-Za-z0-9_-]", "", args.id) or "post"
     name = f"{when:%Y%m%d_%H%M}_{args.account}_{slug}"

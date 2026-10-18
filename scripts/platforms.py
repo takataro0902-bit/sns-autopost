@@ -107,21 +107,42 @@ def threads_text(post):
     return text
 
 
+def _threads_parent_id(post):
+    """threads_reply_to（親の投稿のフォルダ名）があれば、その投稿のThreadsのIDを返す。
+    親がまだ出ていなければ NotReady（失敗には数えず、次の回にやり直す）。
+    公式：https://developers.facebook.com/documentation/threads/retrieve-and-manage-replies/create-replies （reply_to_id）"""
+    parent = post.get("threads_reply_to")
+    if not parent:
+        return None
+    f = QUEUE / parent / "post.json"
+    if not f.exists():
+        raise ApiError(f"続きの親の投稿が見つかりません：{parent}")
+    r = json.loads(f.read_text(encoding="utf-8")).get("result", {}).get("threads", {})
+    if r.get("gave_up"):
+        raise ApiError(f"親の投稿（{parent}）が出せなかったので、続きも出しません")
+    if not r.get("id"):
+        raise NotReady(f"親の投稿（{parent}）がまだ出ていないので待ちます")
+    return r["id"]
+
+
 def post_threads(post_dir, post):
     token = get_token("threads", account_of(post))
     user = "me"
     base = f"{TH_HOST}/{CONFIG['threads_api_version']}"
     text = threads_text(post)
     kind = post["type"]
+    reply_to = _threads_parent_id(post)  # 続き（自分の投稿への返信）なら、親の投稿ID
     urls = [media_url(post_dir, f) for f in post["media"]]
     _check_urls(urls)
-    done = _already_posted(f"{base}/{user}/threads", token, "text", text, post["publish_at"])
+    done = _already_posted(f"{base}/{user}/{'replies' if reply_to else 'threads'}", token, "text", text, post["publish_at"])
     if done:
         log(f"  すでに投稿されていました（ID {done}）。記録だけ直します")
         return done
 
     def create(params):
         params = dict(params, access_token=token)
+        if reply_to and not params.get("is_carousel_item"):
+            params["reply_to_id"] = reply_to
         return http("POST", f"{base}/{user}/threads", params)["id"]
 
     def wait(cid, label):

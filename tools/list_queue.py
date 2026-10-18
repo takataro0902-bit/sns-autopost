@@ -33,7 +33,8 @@ def main():
             r = post.get("result", {}).get(p, {})
             states.append(f"{p}:" + ("済" if r.get("id") else "諦め" if r.get("gave_up") else f"失敗{r['attempts']}回" if r.get("attempts") else "待ち"))
         print(f"{when.astimezone(jst):%m/%d %H:%M}  {post.get('account')}  {post['type']}{len(post['media'])}点  "
-              f"{' '.join(states)}  {post.get('title', d.name)}")
+              f"{' '.join(states)}  {post.get('title', d.name)}"
+              + (f"  ↳続き（親 {post['threads_reply_to']}）" if post.get("threads_reply_to") else ""))
 
 
 if __name__ == "__main__":
