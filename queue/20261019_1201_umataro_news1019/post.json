@@ -8,5 +8,11 @@
   "platforms": [
     "discord"
   ],
-  "discord_channel": "news"
+  "discord_channel": "news",
+  "result": {
+    "discord": {
+      "id": "1561582840804675595",
+      "at": "2026-10-19T03:32:42.115159+00:00"
+    }
+  }
 }

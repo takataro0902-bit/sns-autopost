@@ -8,5 +8,11 @@
   "platforms": [
     "discord"
   ],
-  "discord_channel": "kaiko"
+  "discord_channel": "kaiko",
+  "result": {
+    "discord": {
+      "id": "1561582839172960279",
+      "at": "2026-10-19T03:32:41.973231+00:00"
+    }
+  }
 }
