@@ -27,7 +27,8 @@
         "minna": "🎯みんなの予想・的中",
         "zatsudan": "☕雑談"
       },
-      "discord_channel_ids": {}
+      "discord_channel_ids": {},
+      "threads_check": "rules/umataro_threads.json"
     }
   },
   "timezone_offset": "+09:00",

@@ -273,7 +273,7 @@ check("Threadsの続き：親のあとに reply_to_id 付きで出る", pid and 
       and "reply_to_id" not in creates[0] and creates[1].get("reply_to_id") == [pid], (p.stdout, creates))
 STATE.update(calls=[])
 r = setup()
-add_post(r, "20261020_1310_umataro_p2", account="umataro", type="text", media=[], caption="1本目", platforms=["threads"], publish_at="2026-10-20T13:10:00+09:00")
+add_post(r, "20261020_1310_umataro_p2", account="umataro", type="text", media=[], caption="1本目 続きは下👇", platforms=["threads"], publish_at="2026-10-20T13:10:00+09:00")
 dc2 = add_post(r, "20261020_1301_umataro_c2", account="umataro", type="text", media=[], caption="続き", platforms=["threads"],
                threads_reply_to="20261020_1310_umataro_p2", publish_at="2026-10-20T13:01:00+09:00")
 p = run(r, "scripts/publish.py", env={"THREADS_TOKEN_UMATARO": "t"})
@@ -285,5 +285,29 @@ pb = run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "threads
          "--caption", "続き", "--threads-reply-to", "20261020_1310_umataro_p2")
 jx = json.loads((r / "queue" / "20990103_0900_umataro_x" / "post.json").read_text()) if pa.returncode == 0 else {}
 check("add_post：--threads-reply-to を書く・親より前の時刻は止める", jx.get("threads_reply_to") == "20261020_1310_umataro_p2" and pb.returncode != 0, (pa.stdout + pa.stderr, pb.stderr))
+
+# 17 出す前チェック（rules/umataro_threads.json）：NGは止める・--override で理由付きで入れる・型Bの固定文は通す
+r = setup()
+add_post(r, "20261021_2000_umataro_q1", account="umataro", type="text", media=[], caption="1行目の書き出し\n\n同じ締め", platforms=["threads"],
+         publish_at="2026-10-21T20:00:00+09:00")
+add_post(r, "20261021_2001_umataro_q2", account="umataro", type="text", media=[], caption="親だけ", platforms=["threads"],
+         publish_at="2026-10-21T20:01:00+09:00")
+ap = lambda at, i, cap, *x: run(r, "tools/add_post.py", "--account", "umataro", "--platforms", "threads", "--at", at, "--id", i, "--caption", cap, *x)
+p1 = ap("2026-10-22 12:00", "a1", "うま太郎の〇〇")
+p2 = ap("2026-10-22 12:01", "a2", "データはnetkeibaで見た")
+p3 = ap("2026-10-22 12:02", "a3", "コメントで教えてください")
+p4 = ap("2026-10-22 12:03", "a4", "別の書き出し\n\n同じ締め")
+p5 = ap("2026-10-22 12:04", "a5", "続きだよ", "--threads-reply-to", "20261021_2001_umataro_q2")
+p6 = ap("2026-10-22 12:05", "a6", "別の書き出し\n\n同じ締め", "--override", "テスト")
+p7 = ap("2026-10-22 12:06", "a7", "【秋華賞】、迷ってる人は絶対見てください🐎\n\n▲ 1 A\n\n◎と○はこの3頭以外です。\n\n◎と○は無料オプチャに出します。")
+p8 = ap("2026-10-22 12:07", "a8", "てか、無敗の1番人気どうだった？")
+j6 = json.loads((r / "queue" / "20261022_1205_umataro_a6" / "post.json").read_text()) if p6.returncode == 0 else {}
+check("出す前チェック：〇〇・出典・お願い・締めの被り・誘導のない親は止める",
+      all(p.returncode != 0 for p in (p1, p2, p3, p4, p5)) and "〇〇" in p1.stdout and "出典" in p2.stdout and "お願い" in p3.stdout
+      and "締め" in p4.stdout and "誘導" in p5.stdout, [p.stdout + p.stderr for p in (p1, p2, p3, p4, p5)])
+check("出す前チェック：--override は理由を残して入れる・型Bの固定文と普通の投稿は通す",
+      j6.get("check_override", {}).get("reason") == "テスト" and p7.returncode == 0 and p8.returncode == 0, (p6.stdout + p6.stderr, p7.stdout + p7.stderr, p8.stdout))
+lua = run(r, "tools/add_post.py", "--account", "lua", "--platforms", "threads", "--at", "2026-10-22 12:08", "--id", "l1", "--caption", "見てください")
+check("出す前チェック：ルールのないアカウントは今までどおり", lua.returncode == 0, lua.stdout + lua.stderr)
 
 print("\n全部OK" if ok else "\nNGあり"); sys.exit(0 if ok else 1)

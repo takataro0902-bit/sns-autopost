@@ -31,6 +31,7 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import check_post  # noqa: E402
 from queue_from_postboard import MAX_VIDEO, MEDIA, QUEUE, ROOT, TZ, ensure_media_worktree, to_jpeg  # noqa: E402
 
 IMG = (".png", ".jpg", ".jpeg")
@@ -65,6 +66,7 @@ def main():
     ap.add_argument("--mention-everyone", action="store_true", help="Discordで @everyone を付けて通知する")
     ap.add_argument("--threads-reply-to", default="", help="Threadsで、前に予約した投稿（フォルダ名）の続き＝自分の返信として出す。親より後の時刻にする")
     ap.add_argument("--force", action="store_true", help="同じ予約があれば作り直す（投稿済みは触らない）")
+    ap.add_argument("--override", default="", help="出す前チェックのNGを承知で入れる（理由を書く。post.json に残る）")
     ap.add_argument("files", nargs="*", help="画像・動画・zip（Threadsの文字だけの投稿なら不要）")
     args = ap.parse_args()
 
@@ -117,6 +119,15 @@ def main():
     slug = re.sub(r"[^A-Za-z0-9_-]", "", args.id) or "post"
     name = f"{when:%Y%m%d_%H%M}_{args.account}_{slug}"
     d, md = QUEUE / name, MEDIA / "queue" / name
+    if "threads" in platforms:
+        ng, warn = check_post.check(args.account, caption, when, args.threads_reply_to, name)
+        if ng or warn:
+            print("出す前チェック：")
+            check_post.report(ng, warn)
+        if ng and not args.override:
+            sys.exit("NGがあるので入れませんでした。直すか、承知のうえなら --override \"理由\"")
+        if ng:
+            extra["check_override"] = {"reason": args.override, "ng": ng}
     pj = d / "post.json"
     if pj.exists():
         old = json.loads(pj.read_text(encoding="utf-8"))

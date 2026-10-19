@@ -24,6 +24,7 @@
 | Instagram トークン | 60日有効。作って24時間以上たてば延長できる（この仕組みが毎週月曜に自動で延長） | 同「Business Login」「Get started」 |
 | Threads API | 24時間で250件。カルーセル2〜20点。本文500字まで。リンク5個まで | developers.facebook.com/docs/threads |
 | Threadsの続き（自分の投稿への返信） | `tools/add_post.py --threads-reply-to <親のフォルダ名>`。親が出たあと `reply_to_id` 付きで出す（親がまだなら待つ）。時刻は親の1〜2分後に | developers.facebook.com/documentation/threads/retrieve-and-manage-replies/create-replies |
+| 出す前チェック（Threads） | config の `threads_check` にルール（例：rules/umataro_threads.json）を書くと、add_post.py が予約前に確かめる。NG（伏せ字・出典・お願いの形・直近7日と同じ書き出し/締め・誘導のない親）は止め、`--override "理由"` で理由付きで入れられる。原稿だけなら `tools/check_post.py` | このリポジトリ |
 | Discord（ボット） | 自分のサーバーだけで使うボットは審査なし。1つのトークンで、ボットに権限があるチャンネルすべてに投稿できる（読むだけのカテゴリーは、カテゴリーの権限でボットに「送信」を許可する必要あり）。チャンネルの権限は「@everyoneの上書き→ロールの上書き」の順に効く | docs.discord.com「Permissions」「Message › Create Message」「Channel › Start Thread from Message」 |
 | Discord（ウェブフック） | ボット・審査不要で、URLを知っていれば指定チャンネルに投稿できる。料金の記載は公式ページになし（未確認だが、API利用料の仕組み自体が見当たらない）。本文2000字まで。添付は1ファイル既定20MiBまで（サーバーのブースト等で増える）。1通の添付上限は公式に記載が見当たらず、この仕組みは10点ずつに分けて送る | docs.discord.com「Webhook」「Reference › Uploading Files」、support.discord.com「Intro to Webhooks」 |
 | X API | 月額なしの従量制。1投稿0.015ドル、URL入りは0.20ドル。カード登録で20ドル分のクレジット | docs.x.com「Pricing」 |
