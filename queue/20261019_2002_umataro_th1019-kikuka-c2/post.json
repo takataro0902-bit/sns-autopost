@@ -8,5 +8,10 @@
   "platforms": [
     "threads"
   ],
-  "threads_reply_to": "20261019_2000_umataro_th1019-kikuka-course"
+  "threads_reply_to": "20261019_2000_umataro_th1019-kikuka-course",
+  "result": {
+    "threads": {
+      "error": "親の投稿（20261019_2000_umataro_th1019-kikuka-course）がまだ出ていないので待ちます"
+    }
+  }
 }
