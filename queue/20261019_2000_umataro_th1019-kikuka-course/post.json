@@ -12,8 +12,8 @@
   ],
   "result": {
     "threads": {
-      "attempts": 1,
-      "error": "HTTP 400 https://graph.threads.net/v1.0/me/threads_publish: {\"error\":{\"message\":\"The requested resource does not exist\",\"type\":\"OAuthException\",\"code\":24,\"error_subcode\":4279009,\"is_transient\":false,\"error_user_title\":\"Media Not Found\",\"error_user_msg\":\"The media with id 17988830547118500 cannot be found.\",\"fbtrace_id\":\"A5CKKErhyPclWEYTDANQhyC\"}}"
+      "id": "17912501880508509",
+      "at": "2026-10-19T11:49:27.846634+00:00"
     }
   }
 }
