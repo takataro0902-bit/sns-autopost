@@ -7,5 +7,11 @@
   "title": "th1020-neta-shuka",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "17896392045417631",
+      "at": "2026-10-20T03:28:30.241727+00:00"
+    }
+  }
 }
