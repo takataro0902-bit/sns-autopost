@@ -8,5 +8,11 @@
   "platforms": [
     "threads"
   ],
-  "threads_reply_to": "20261020_2000_umataro_th1020-kikuka-zenso"
+  "threads_reply_to": "20261020_2000_umataro_th1020-kikuka-zenso",
+  "result": {
+    "threads": {
+      "id": "18631409287012219",
+      "at": "2026-10-20T11:04:58.565954+00:00"
+    }
+  }
 }

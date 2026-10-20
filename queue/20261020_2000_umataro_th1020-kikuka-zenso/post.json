@@ -9,5 +9,11 @@
   "title": "th1020-kikuka-zenso",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "17912334432506997",
+      "at": "2026-10-20T11:04:18.880163+00:00"
+    }
+  }
 }
