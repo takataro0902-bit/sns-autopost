@@ -9,5 +9,11 @@
   "title": "th1021-kikuka-pace",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18337806922273802",
+      "at": "2026-10-21T11:29:56.662410+00:00"
+    }
+  }
 }
