@@ -9,5 +9,11 @@
   "title": "th1022-kikuka-waku",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18335584093277634",
+      "at": "2026-10-22T11:30:29.714037+00:00"
+    }
+  }
 }
