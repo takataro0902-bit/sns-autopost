@@ -1,0 +1,24 @@
+{
+  "publish_at": "2026-10-23T12:00:00+09:00",
+  "account": "umataro",
+  "type": "image",
+  "media": [
+    "01.jpg"
+  ],
+  "caption": "ソダシもチェルヴィニアもここ勝ってるの、アルテミスSガチの出世レースすぎる🐎\n\nここ10年の勝ち馬、のちのG1馬だけでこの5頭。\n\nリスグラシュー\nラッキーライラック\nソダシ\nサークルオブライフ\nチェルヴィニア\n\n2022年なんて、リバティアイランドですら2着で負けてる。\n\n2歳の秋のG3で、このメンツはえぐい。\n\n明日のアルテミスS、僕が一番気になってる1頭はオプチャで言う。\n\n▼無料オプチャ\nhttps://line.me/ti/g2/_a5mlLV1NHPuIuEjxay3dstFIZ795wXLWmQWmg?utm_source=invitation&utm_medium=link_copy&utm_campaign=default",
+  "title": "th1023-artemis-yudo",
+  "check_override": {
+    "reason": "締めはCEOが決めた誘導の固定形（▼無料オプチャ＋URL）。URLの行が被るだけで、最後の文は10/17・18と違う",
+    "ng": [
+      "締めが 20261016_2000_umataro_th1016eve と同じ（直近7日は使わない）",
+      "締めが 20261017_0900_umataro_th1017am と同じ（直近7日は使わない）",
+      "締めが 20261017_1200_umataro_th1017noon と同じ（直近7日は使わない）",
+      "締めが 20261017_2000_umataro_th1017eve と同じ（直近7日は使わない）",
+      "締めが 20261018_0900_umataro_th1018am と同じ（直近7日は使わない）",
+      "締めが 20261018_1200_umataro_th1018noon と同じ（直近7日は使わない）"
+    ]
+  },
+  "platforms": [
+    "threads"
+  ]
+}
