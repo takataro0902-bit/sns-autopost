@@ -8,5 +8,11 @@
   "platforms": [
     "threads"
   ],
-  "threads_reply_to": "20261022_1200_umataro_th1022-neta-tsu"
+  "threads_reply_to": "20261022_1200_umataro_th1022-neta-tsu",
+  "result": {
+    "threads": {
+      "id": "17906824278666282",
+      "at": "2026-10-22T03:29:21.727246+00:00"
+    }
+  }
 }
