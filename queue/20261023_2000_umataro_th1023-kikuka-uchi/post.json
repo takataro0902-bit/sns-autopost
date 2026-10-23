@@ -9,5 +9,11 @@
   "title": "th1023-kikuka-uchi",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18120991133293454",
+      "at": "2026-10-23T11:29:53.400402+00:00"
+    }
+  }
 }

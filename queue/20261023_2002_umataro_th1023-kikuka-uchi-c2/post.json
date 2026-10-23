@@ -8,5 +8,11 @@
   "platforms": [
     "threads"
   ],
-  "threads_reply_to": "20261023_2000_umataro_th1023-kikuka-uchi"
+  "threads_reply_to": "20261023_2000_umataro_th1023-kikuka-uchi",
+  "result": {
+    "threads": {
+      "id": "18135808480663330",
+      "at": "2026-10-23T11:31:12.464966+00:00"
+    }
+  }
 }
