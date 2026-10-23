@@ -1,0 +1,22 @@
+{
+  "publish_at": "2026-10-24T20:00:00+09:00",
+  "account": "umataro",
+  "type": "image",
+  "media": [
+    "01.jpg"
+  ],
+  "caption": "ブルボンもネオユニもサムソンも、菊で止まった。平成の二冠馬は4勝3敗🐎\n\n皐月賞とダービーを両方勝った馬は、平成以降で10頭。\nそのうちテイオー、サニーブライアン、ドゥラメンテの3頭は菊に出てない。\n\n出た7頭で勝ったのは\nナリタブライアン\nディープインパクト\nオルフェーヴル\nコントレイル\n\n負けた3頭は2着、3着、4着。\n\n明日、ロブチェンが8頭目として菊に出る。\n\n僕が狙う1頭は、もう決めた。今夜オプチャに置いとく。\n\n▼無料オプチャ\nhttps://line.me/ti/g2/_a5mlLV1NHPuIuEjxay3dstFIZ795wXLWmQWmg?utm_source=invitation&utm_medium=link_copy&utm_campaign=default",
+  "title": "th1024-kikuka-yudo",
+  "check_override": {
+    "reason": "誘導の固定形（▼無料オプチャ＋URLで終える）。最後の文は直近と違う",
+    "ng": [
+      "締めが 20261017_2000_umataro_th1017eve と同じ（直近7日は使わない）",
+      "締めが 20261018_0900_umataro_th1018am と同じ（直近7日は使わない）",
+      "締めが 20261018_1200_umataro_th1018noon と同じ（直近7日は使わない）",
+      "締めが 20261023_1200_umataro_th1023-artemis-yudo と同じ（直近7日は使わない）"
+    ]
+  },
+  "platforms": [
+    "threads"
+  ]
+}
