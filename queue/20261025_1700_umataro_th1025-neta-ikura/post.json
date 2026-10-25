@@ -7,5 +7,11 @@
   "title": "th1025-neta-ikura",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "17934894549409239",
+      "at": "2026-10-25T08:25:14.978529+00:00"
+    }
+  }
 }
