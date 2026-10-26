@@ -8,5 +8,11 @@
   "platforms": [
     "threads"
   ],
-  "threads_reply_to": "20261026_2000_umataro_th1026-akiten-course"
+  "threads_reply_to": "20261026_2000_umataro_th1026-akiten-course",
+  "result": {
+    "threads": {
+      "id": "18133006156793709",
+      "at": "2026-10-26T11:11:51.727683+00:00"
+    }
+  }
 }

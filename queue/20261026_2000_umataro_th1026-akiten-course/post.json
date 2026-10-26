@@ -9,5 +9,11 @@
   "title": "th1026-akiten-course",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18123944746994594",
+      "at": "2026-10-26T11:11:12.368631+00:00"
+    }
+  }
 }
