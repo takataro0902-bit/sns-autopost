@@ -1,0 +1,28 @@
+name: Threadsの数字を取る
+on:
+  workflow_dispatch:
+  push:
+    branches: ["claude/**"]
+    paths: ["scripts/insights.py", ".github/workflows/insights.yml", ".insights-request"]
+
+permissions:
+  contents: write
+
+jobs:
+  insights:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: 数字を読む（投稿はしません）
+        env:
+          THREADS_TOKEN_UMATARO: ${{ secrets.THREADS_TOKEN_UMATARO }}
+        run: python3 scripts/insights.py umataro
+      - name: 結果を記録
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898+github-actions[bot]@users.noreply.github.com"
+          git add insights/
+          git diff --cached --quiet && exit 0
+          git commit -m "Threadsの数字を記録"
+          git push origin HEAD:${GITHUB_REF_NAME}
