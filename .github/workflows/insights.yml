@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: publish   # 予約投稿と同時にpushしてぶつからないように、順番に動かす
+  group: insights   # publishと同じグループにすると待ち中の予約投稿が取り消されることがあるので分ける。pushのぶつかりは pull --rebase で避ける
   cancel-in-progress: false
 
 jobs:
