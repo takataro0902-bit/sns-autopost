@@ -1,5 +1,7 @@
 name: Threadsの数字を取る
 on:
+  schedule:
+    - cron: "30 11 * * *"   # 毎日20:30（日本時間）。毎晩20:44の作業が最新の数字を読めるように
   workflow_dispatch:
   push:
     branches: ["claude/**"]
@@ -7,6 +9,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: publish   # 予約投稿と同時にpushしてぶつからないように、順番に動かす
+  cancel-in-progress: false
 
 jobs:
   insights:
@@ -25,4 +31,5 @@ jobs:
           git add insights/
           git diff --cached --quiet && exit 0
           git commit -m "Threadsの数字を記録"
+          git pull --rebase -q origin ${GITHUB_REF_NAME}
           git push origin HEAD:${GITHUB_REF_NAME}

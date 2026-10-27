@@ -121,6 +121,7 @@ Claudeがテスト用の投稿を1本用意し、本人の了解を取ってか�
 - `queue/<日付_時刻_事業_ID>/01.jpg など`（media ブランチ）：画像・動画。GitHub Pagesで公開し、APIが取りに来る
 - `scripts/publish.py`：時間が来た投稿を公開する（3回失敗、または予定から3時間過ぎたら諦めてメール。画像URLの準備待ちは失敗に数えない。投稿済みなのに記録が残らなかったときは二重に出さない）
 - `scripts/platforms.py`：Instagram・Threads・Discordへの投稿処理
+- `scripts/insights.py`：Threadsの数字（投稿ごとの表示・いいね・返信・再投稿・引用・シェア、アカウントの日別の表示・フォロワー数）を読んで `insights/` に書く。投稿はしない。ワークフロー「Threadsの数字を取る」が毎日20:30に動く（手動でも動かせる）。投稿ごとのフォロー増はAPIにないので取れない
 - `scripts/refresh_tokens.py`：毎週月曜に、Secretsの `IG_TOKEN_*`・`THREADS_TOKEN_*` をすべて延長
 - `scripts/cleanup.py`：毎週日曜3時に、済んだ投稿の画像・動画を media ブランチから消し、ブランチを1コミットに作り直す
 - `scripts/check.py`：設定の確認（投稿はしない）
