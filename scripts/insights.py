@@ -89,7 +89,7 @@ def run(account):
 
     out_dir = ROOT / "insights"
     out_dir.mkdir(exist_ok=True)
-    stamp = datetime.now(JST).strftime("%Y%m%d_%H%M")
+    stamp = datetime.now(JST).strftime("%Y%m%d_%H%M%S")
     (out_dir / f"{account}_{stamp}.json").write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
     cols = ["timestamp", "kind", "queue", "views", "likes", "replies", "reposts", "quotes", "shares", "permalink", "text", "insights_error"]
     with open(out_dir / f"{account}_{stamp}.csv", "w", encoding="utf-8-sig", newline="") as f:
