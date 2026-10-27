@@ -9,5 +9,11 @@
   "title": "th1027-akiten-zenso",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18230711449336014",
+      "at": "2026-10-27T11:33:04.574883+00:00"
+    }
+  }
 }

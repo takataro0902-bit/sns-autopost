@@ -8,5 +8,11 @@
   "platforms": [
     "threads"
   ],
-  "threads_reply_to": "20261027_2000_umataro_th1027-akiten-zenso"
+  "threads_reply_to": "20261027_2000_umataro_th1027-akiten-zenso",
+  "result": {
+    "threads": {
+      "id": "18129905725887906",
+      "at": "2026-10-27T11:33:44.557487+00:00"
+    }
+  }
 }
