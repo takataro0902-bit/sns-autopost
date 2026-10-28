@@ -7,5 +7,11 @@
   "title": "th1028-neta-saikyo",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18083772611374167",
+      "at": "2026-10-28T03:16:50.588121+00:00"
+    }
+  }
 }
