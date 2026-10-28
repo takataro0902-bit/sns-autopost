@@ -28,6 +28,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898+github-actions[bot]@users.noreply.github.com"
+          [ -d insights/ ] || exit 0
           git add insights/
           git diff --cached --quiet && exit 0
           git commit -m "Threadsの数字を記録"

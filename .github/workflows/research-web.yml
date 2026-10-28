@@ -22,6 +22,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898+github-actions[bot]@users.noreply.github.com"
+          [ -d research/ ] || exit 0
           git add research/
           git diff --cached --quiet && exit 0
           git commit -m "公開ページを記録"
