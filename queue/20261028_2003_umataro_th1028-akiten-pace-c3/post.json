@@ -8,5 +8,11 @@
   "platforms": [
     "threads"
   ],
-  "threads_reply_to": "20261028_2000_umataro_th1028-akiten-pace"
+  "threads_reply_to": "20261028_2000_umataro_th1028-akiten-pace",
+  "result": {
+    "threads": {
+      "id": "18178760569432009",
+      "at": "2026-10-28T11:19:30.510295+00:00"
+    }
+  }
 }

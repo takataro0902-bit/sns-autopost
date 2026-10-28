@@ -9,5 +9,11 @@
   "title": "th1028-akiten-pace",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "17996900934101982",
+      "at": "2026-10-28T11:17:38.306789+00:00"
+    }
+  }
 }
