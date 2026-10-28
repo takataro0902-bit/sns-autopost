@@ -1,6 +1,7 @@
 // 他アカウントの公開ページ（ログインなし）を開いて文字だけ保存する。読むだけ・投稿しない
 const {chromium} = require('playwright');
 const fs = require('fs');
+if (!fs.existsSync('.research-web.json')) { console.log('調べる先（.research-web.json）がないので何もしません'); process.exit(0); }
 const req = JSON.parse(fs.readFileSync('.research-web.json', 'utf8'));
 (async () => {
   const b = await chromium.launch();

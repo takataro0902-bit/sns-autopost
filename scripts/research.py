@@ -48,5 +48,8 @@ def run(account, queries, users):
 
 
 if __name__ == "__main__":
-    req = json.loads((ROOT / ".research-request.json").read_text(encoding="utf-8"))
+    f = ROOT / ".research-request.json"
+    if not f.exists():
+        sys.exit(log("調べる内容（.research-request.json）がないので何もしません") or 0)
+    req = json.loads(f.read_text(encoding="utf-8"))
     run("umataro", req.get("queries", []), req.get("users", []))
