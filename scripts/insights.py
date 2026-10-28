@@ -54,7 +54,7 @@ def run(account):
     tk = token("threads", account)
     base = f"{TH_HOST}/{CONFIG['threads_api_version']}"
     report = {"account": account, "fetched_at": datetime.now(JST).isoformat(), "errors": []}
-    me = http("GET", f"{base}/me", {"fields": "id,username", "access_token": tk})
+    me = http("GET", f"{base}/me", {"fields": "id,username,threads_biography", "access_token": tk})
     report["user"] = me
     fields = "id,timestamp,text,permalink,media_type,is_quote_post"
     posts = []
@@ -76,6 +76,19 @@ def run(account):
             p["insights_error"] = str(e)[:300]
         time.sleep(0.2)
     report["posts"] = sorted(posts, key=lambda x: x.get("timestamp", ""))
+
+    # 返信が付いた投稿は、コメント欄の中身も取る（何を言われているかを見るため）。
+    # 公開リポジトリに残るので、相手のユーザー名は保存しない（本文・時刻・自分の返信かどうかだけ）
+    for p in report["posts"]:
+        if p["kind"] != "本体" or not p.get("replies"):
+            continue
+        try:
+            conv = _pages(f"{base}/{p['id']}/conversation",
+                          {"fields": "id,text,timestamp,is_reply_owned_by_me", "reverse": "false", "access_token": tk}, 5)
+            p["conversation"] = [{"text": c.get("text", ""), "timestamp": c.get("timestamp"), "mine": c.get("is_reply_owned_by_me", False)} for c in conv]
+        except ApiError as e:
+            p["conversation_error"] = str(e)[:300]
+        time.sleep(0.2)
 
     # アカウント全体（日別の表示は最大で過去の一定期間。取れた分だけ）
     until = int(time.time())
