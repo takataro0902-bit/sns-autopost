@@ -8,5 +8,11 @@
   "platforms": [
     "threads"
   ],
-  "threads_reply_to": "20261029_2000_umataro_th1029-akiten-ninki"
+  "threads_reply_to": "20261029_2000_umataro_th1029-akiten-ninki",
+  "result": {
+    "threads": {
+      "id": "18122861974941577",
+      "at": "2026-10-29T11:16:32.573484+00:00"
+    }
+  }
 }

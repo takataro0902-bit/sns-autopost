@@ -9,5 +9,11 @@
   "title": "th1029-akiten-ninki",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18624524581050104",
+      "at": "2026-10-29T11:15:16.722531+00:00"
+    }
+  }
 }
