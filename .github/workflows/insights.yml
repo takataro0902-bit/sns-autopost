@@ -1,0 +1,36 @@
+name: Threadsの数字を取る
+on:
+  schedule:
+    - cron: "30 11 * * *"   # 毎日20:30（日本時間）。毎晩20:44の作業が最新の数字を読めるように
+  workflow_dispatch:
+  push:
+    branches: ["claude/**"]
+    paths: ["scripts/insights.py", ".github/workflows/insights.yml", ".insights-request"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: insights   # publishと同じグループにすると待ち中の予約投稿が取り消されることがあるので分ける。pushのぶつかりは pull --rebase で避ける
+  cancel-in-progress: false
+
+jobs:
+  insights:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: 数字を読む（投稿はしません）
+        env:
+          THREADS_TOKEN_UMATARO: ${{ secrets.THREADS_TOKEN_UMATARO }}
+        run: python3 scripts/insights.py umataro
+      - name: 結果を記録
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898+github-actions[bot]@users.noreply.github.com"
+          [ -d insights/ ] || exit 0
+          git add insights/
+          git diff --cached --quiet && exit 0
+          git commit -m "Threadsの数字を記録"
+          git pull --rebase -q origin ${GITHUB_REF_NAME}
+          git push origin HEAD:${GITHUB_REF_NAME}
