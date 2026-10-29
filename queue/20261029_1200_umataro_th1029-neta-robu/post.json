@@ -7,5 +7,11 @@
   "title": "th1029-neta-robu",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18123642784989944",
+      "at": "2026-10-29T03:21:20.363308+00:00"
+    }
+  }
 }
