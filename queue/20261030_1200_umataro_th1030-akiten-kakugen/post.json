@@ -9,5 +9,11 @@
   "title": "th1030-akiten-kakugen",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18050113649824258",
+      "at": "2026-10-30T03:20:51.159754+00:00"
+    }
+  }
 }
