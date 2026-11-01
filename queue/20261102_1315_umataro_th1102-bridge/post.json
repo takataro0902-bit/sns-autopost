@@ -1,0 +1,18 @@
+{
+  "publish_at": "2026-11-02T13:15:00+09:00",
+  "account": "umataro",
+  "type": "text",
+  "media": [],
+  "caption": "アルゼンチン共和国杯、「後方一気のレース」って書く人と「好位から長く脚」って書く人で割れてる。\n\n2016〜22年の勝ち馬は、7頭とも4角7番手以内。\n\nどっちが合ってるか、今夜20時に10年分並べる。",
+  "title": "th1102-bridge",
+  "platforms": [
+    "threads"
+  ],
+  "threads_reply_to": "20261102_1200_umataro_th1102-akiten-yokujitsu",
+  "check_override": {
+    "reason": "v3.0（CEO 10/29 OK）で親から続きへの誘導の必須は外した（Threads投稿ルール10章）。main の rules は旧版のまま（PR #6未マージ）。型10 橋の返信",
+    "ng": [
+      "親の投稿が続きへ誘導していない：続きを付ける親は、最後に続きへ誘導する（4章）"
+    ]
+  }
+}
