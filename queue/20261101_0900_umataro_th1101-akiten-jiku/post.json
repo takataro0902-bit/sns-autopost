@@ -7,5 +7,11 @@
   "title": "th1101-akiten-jiku",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18208551721374616",
+      "at": "2026-11-01T00:05:17.230502+00:00"
+    }
+  }
 }
