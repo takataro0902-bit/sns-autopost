@@ -9,5 +9,11 @@
   "title": "th1102-ar-course",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "17940372168391731",
+      "at": "2026-11-02T11:36:09.986595+00:00"
+    }
+  }
 }
