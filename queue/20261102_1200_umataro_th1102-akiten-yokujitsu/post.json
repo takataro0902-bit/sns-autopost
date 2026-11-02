@@ -7,5 +7,11 @@
   "title": "th1102-akiten-yokujitsu",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "17929739322432550",
+      "at": "2026-11-02T03:21:29.173292+00:00"
+    }
+  }
 }
