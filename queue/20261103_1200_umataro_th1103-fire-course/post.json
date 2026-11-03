@@ -7,5 +7,11 @@
   "title": "th1103-fire-course",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "17893873104685157",
+      "at": "2026-11-03T03:47:20.890660+00:00"
+    }
+  }
 }
