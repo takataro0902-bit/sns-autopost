@@ -1,0 +1,18 @@
+{
+  "publish_at": "2026-11-05T13:15:00+09:00",
+  "account": "umataro",
+  "type": "text",
+  "media": [],
+  "caption": "人気馬を疑う話でいうと、日曜のアルゼンチン共和国杯は2番人気と3番人気で数字がまるでちがう。\n\n過去10年で3着までに来たのは、2番人気が3回。\n\n3番人気は7回。",
+  "title": "th1105-bridge",
+  "platforms": [
+    "threads"
+  ],
+  "threads_reply_to": "20261105_1200_umataro_th1105-shukei",
+  "check_override": {
+    "reason": "v3.0 4章：橋の返信は親が続きへ誘導しない形（v3.0で外した決まり）。main の rules は旧版のまま（PR #6 未マージ）",
+    "ng": [
+      "親の投稿が続きへ誘導していない：続きを付ける親は、最後に続きへ誘導する（4章）"
+    ]
+  }
+}
