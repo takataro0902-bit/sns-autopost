@@ -7,5 +7,11 @@
   "title": "th1104-pace-nitaku",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18129478852817762",
+      "at": "2026-11-04T03:20:56.953650+00:00"
+    }
+  }
 }
