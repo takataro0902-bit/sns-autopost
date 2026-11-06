@@ -9,5 +9,11 @@
   "title": "th1106-ar-kakugen",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18119740069799624",
+      "at": "2026-11-06T03:25:17.816785+00:00"
+    }
+  }
 }
