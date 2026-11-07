@@ -7,5 +7,11 @@
   "title": "th1107-ar-atekko",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18413017294089458",
+      "at": "2026-11-07T11:12:26.773305+00:00"
+    }
+  }
 }
