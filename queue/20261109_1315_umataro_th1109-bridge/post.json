@@ -1,0 +1,18 @@
+{
+  "publish_at": "2026-11-09T13:15:00+09:00",
+  "account": "umataro",
+  "type": "text",
+  "media": [],
+  "caption": "エリ女の1番人気も、京都でやった7回のうち3回は馬券外。\n\n勝ったのは2回だけ。\n\nエリ女の格言確かめ、1つ目のコースは20時に置いとく。",
+  "title": "th1109-bridge",
+  "platforms": [
+    "threads"
+  ],
+  "threads_reply_to": "20261109_1200_umataro_th1109-ar-yokujitsu",
+  "check_override": {
+    "reason": "v3.0の橋の返信（型10）。親に続きへの誘導を求めるのは旧ルール。v3.0用rulesはPR #6未マージ",
+    "ng": [
+      "親の投稿が続きへ誘導していない：続きを付ける親は、最後に続きへ誘導する（4章）"
+    ]
+  }
+}
