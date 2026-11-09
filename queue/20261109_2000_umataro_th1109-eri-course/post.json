@@ -9,5 +9,11 @@
   "title": "th1109-eri-course",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18132052178502191",
+      "at": "2026-11-09T11:38:39.942227+00:00"
+    }
+  }
 }
