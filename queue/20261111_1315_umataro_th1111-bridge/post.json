@@ -1,0 +1,18 @@
+{
+  "publish_at": "2026-11-11T13:15:00+09:00",
+  "account": "umataro",
+  "type": "text",
+  "media": [],
+  "caption": "エリ女の京都、1000m通過に62秒8かかった年もある。\n\nそれでも7回とも、ある1ハロンで急に速くなってた。\n\nそれがどの1ハロンかは、20時に7回分並べて出す。",
+  "title": "th1111-bridge",
+  "platforms": [
+    "threads"
+  ],
+  "threads_reply_to": "20261111_1200_umataro_th1111-yodo-nitaku",
+  "check_override": {
+    "reason": "v3.0の橋の返信（型10）。親の続き誘導はv3.0で外した決まり、PR #6 未マージ",
+    "ng": [
+      "親の投稿が続きへ誘導していない：続きを付ける親は、最後に続きへ誘導する（4章）"
+    ]
+  }
+}
