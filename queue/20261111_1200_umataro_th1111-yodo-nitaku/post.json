@@ -7,5 +7,11 @@
   "title": "th1111-yodo-nitaku",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18110748566255193",
+      "at": "2026-11-11T03:26:51.080488+00:00"
+    }
+  }
 }
