@@ -1,0 +1,18 @@
+{
+  "publish_at": "2026-11-12T13:15:00+09:00",
+  "account": "umataro",
+  "type": "text",
+  "media": [],
+  "caption": "格で言うなら1番人気だけど、エリ女の過去10年で1番人気は3勝。\n\nそれより勝ってる人気が1つあって、それは20時に。",
+  "title": "th1112-bridge",
+  "platforms": [
+    "threads"
+  ],
+  "threads_reply_to": "20261112_1200_umataro_th1112-shukei",
+  "check_override": {
+    "reason": "型10 橋の返信（v3.0で親の続き誘導は不要。mainのrulesは旧版）",
+    "ng": [
+      "親の投稿が続きへ誘導していない：続きを付ける親は、最後に続きへ誘導する（4章）"
+    ]
+  }
+}
