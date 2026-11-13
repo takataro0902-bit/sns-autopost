@@ -9,5 +9,11 @@
   "title": "th1113-eri-kakugen",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "gave_up": true,
+      "error": "予定から180分以上過ぎたので投稿しませんでした"
+    }
+  }
 }
