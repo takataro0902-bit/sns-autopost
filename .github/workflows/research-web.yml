@@ -1,0 +1,30 @@
+name: 他アカウントの公開ページを読む
+on:
+  workflow_dispatch:
+  push:
+    branches: ["claude/**"]
+    paths: [".research-web.json", "scripts/research_web.js"]
+
+permissions:
+  contents: write
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: 準備
+        run: npm i --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
+      - name: 読む（投稿はしません）
+        run: node scripts/research_web.js
+      - name: 結果を記録
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898+github-actions[bot]@users.noreply.github.com"
+          [ -d research/ ] || exit 0
+          git add research/
+          git diff --cached --quiet && exit 0
+          git commit -m "公開ページを記録"
+          git pull --rebase -q origin ${GITHUB_REF_NAME}
+          git push origin HEAD:${GITHUB_REF_NAME}
