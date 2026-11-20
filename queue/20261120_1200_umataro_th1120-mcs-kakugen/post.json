@@ -9,5 +9,11 @@
   "title": "th1120-mcs-kakugen",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18081769706583424",
+      "at": "2026-11-20T03:03:13.442196+00:00"
+    }
+  }
 }
