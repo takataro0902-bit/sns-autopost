@@ -1,0 +1,18 @@
+{
+  "publish_at": "2026-11-23T13:15:00+09:00",
+  "account": "umataro",
+  "type": "text",
+  "media": [],
+  "caption": "ジャパンカップは過去10年、1番の馬が3回勝ってる。\n\n今夜20時は「内枠有利」がほんとか、馬番10年分で確かめる。",
+  "title": "th1123-bridge",
+  "platforms": [
+    "threads"
+  ],
+  "threads_reply_to": "20261123_1200_umataro_th1123-mcs-yokujitsu",
+  "check_override": {
+    "reason": "v3.0の橋の返信（親への続き誘導の必須はv3.0で外した。main の rules は PR #6 未マージで旧版）",
+    "ng": [
+      "親の投稿が続きへ誘導していない：続きを付ける親は、最後に続きへ誘導する（4章）"
+    ]
+  }
+}

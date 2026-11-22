@@ -1,0 +1,18 @@
+{
+  "publish_at": "2026-11-22T21:30:00+09:00",
+  "account": "umataro",
+  "type": "text",
+  "media": [],
+  "caption": "🎯マイルCS、頭を当ててたのは6人中1人🐎\n\n勝ったのはエルデナリ。\n\nその1人は、土曜の夜のうちに馬名だけ置いてってた。\n\n次はジャパンカップ。土曜の夜に、また頭だけ聞く。\n\n今の時点で、もう頭に浮かんでる馬いる？",
+  "title": "th1122-mcs-kotae",
+  "platforms": [
+    "threads"
+  ],
+  "threads_reply_to": "20261121_2000_umataro_th1121-mcs-atekko",
+  "check_override": {
+    "reason": "v3.0の返信（親への続き誘導の必須はv3.0で外した。main の rules は PR #6 未マージで旧版）",
+    "ng": [
+      "親の投稿が続きへ誘導していない：続きを付ける親は、最後に続きへ誘導する（4章）"
+    ]
+  }
+}
