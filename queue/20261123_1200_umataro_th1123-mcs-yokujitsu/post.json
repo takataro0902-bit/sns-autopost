@@ -7,5 +7,11 @@
   "title": "th1123-mcs-yokujitsu",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "17916606279285090",
+      "at": "2026-11-23T03:03:29.567123+00:00"
+    }
+  }
 }
