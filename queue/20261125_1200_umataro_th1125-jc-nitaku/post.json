@@ -7,5 +7,11 @@
   "title": "th1125-jc-nitaku",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18139991569728126",
+      "at": "2026-11-25T03:03:56.992185+00:00"
+    }
+  }
 }
