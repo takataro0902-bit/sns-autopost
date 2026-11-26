@@ -9,5 +9,10 @@
   "title": "th1126-jc-ninki",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "error": "画像・動画のURLがまだ開けません：https://takataro0902-bit.github.io/sns-autopost/queue/20261126_2000_umataro_th1126-jc-ninki/01.jpg"
+    }
+  }
 }
