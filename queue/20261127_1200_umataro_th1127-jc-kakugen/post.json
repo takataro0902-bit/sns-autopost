@@ -9,5 +9,11 @@
   "title": "th1127-jc-kakugen",
   "platforms": [
     "threads"
-  ]
+  ],
+  "result": {
+    "threads": {
+      "id": "18123678965066922",
+      "at": "2026-11-27T03:03:34.976453+00:00"
+    }
+  }
 }
